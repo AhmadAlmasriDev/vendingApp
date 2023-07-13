@@ -3,26 +3,26 @@ from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import datetime as dt
-
+from os import system, name
 # Constants------------------------------------------------------------------------------
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/drive"
     ]
-TEMP_KEY={
-  "type": "service_account",
-  "project_id": "vendingapp-392515",
-  "private_key_id": "0be6093985315d571ba283c2a56b664a13b22a27",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCxqxU67nXgJqKg\nYgilePd673K/8QA6EWnl3kRSxjOyDxK+0LWBUDmtVqHOEiZk92fRJPBs9crQ00GR\nWcYB3IK7xtKuE2RYJJbMDscrgfpHISsCBn9ChqEyz4LfUSM+lO7GFANxg3FBWpO4\nX75oiUpGQyE+oNZa3pCDlEuuQyF4DyehlFbpdFfiXcDjlgibUEQHvF3VzU3rzWW1\nahAzoB8zjOhCMZ3noUmnwkzPKAxb84nZCHLsZIPKlaVeQnJUs3NV6G3IniZPOByl\n7bEveZj5tRNNZZHseMRxrslAYsNalQcCagRr5mB9asxDxz2WBoSbxDuCj7W3k4D1\nQpZRKC7nAgMBAAECggEATmkWdA1EyZnTgRvy+/CArGlcB9j5hCcmSPRIzA08SHO9\njqg2yqzY36bRv0wkVMAZueRnFXd+vJ3XnKn1qOGkcvIDDh9x1DLFuKY3AX0aM2Uw\ngXLTnE0lfHK3rA43k0mQfavcfy8G/1RVyHO86Y7Z0FuVIvpB0BXUyrValzx6W2z8\niudwPeTfs89jfdGFen452QaQwlIsvDsKRTf0zBa936gTTfSB7jbI6DZKACNyn6k8\nve4wQCqbjx6wUowqTXI0O6yQ/ItNjOYEtO/qfTSJiZIUSOaLA/YuSuWhNls0kTSE\nGk6o8TIdpnUyLDjQyGHTeCPxdORHJKVlUDhcq9jB9QKBgQDXwg/uxfBuIsNmGEzv\nmT0K1QcX4oat+cSIJXMJihyzy2JRrvKChIZJM20Wh9KG4oAoiWPVZ7ZqWnLYq4O7\n2oHL/p2AAxrYwRgboymr9nuDkBOYwYWkE9RZ0cRwDySmZantfbUiyriQuUdZTEqA\nr67qIUu0N8y3VSMyvxMfvjpyowKBgQDSzlMOnzJ88TmTbMnWGW5PT1ZTpetXFdxb\nyaT8kBa1UmuJZDW6/VlLKAXVwEGInZO3xj8ErDtSqEVSvBQRb/iYM9nUg7C75MC/\nz4/czKFazG7HA6NjskfTGtZ/zN1q1j2DLrH+Zp3BUP06xv47P+G4Gk+ETmpBAHMc\nkxi2evKa7QKBgG0MpMjmOpMv9trPRXOEXBnxedhUogWky/SUGQSlTcSB83udlOzq\n1oSA/Y35sCqEqInUhyUBem1esdVZOwfjdN8KHcjpyNPtJKYzXYiQ1/SzCXSXu1gm\nvZl4MHUC8l832x8x/i9LjuV2/9zednl8Ukf79CtuWIYA/f1UHfJZT2lJAoGAMUCj\nhzcKxMZXfWpdffhTHZSbxs9tPNuOsKNcOOYxaAvptCAFrbqjsjuXoWlZ5mFqsfVP\no/fZpGZMTBhFWA2hN25l5pEeKcg4gJguNJha2qwI9daTxidRQLF0jEeBNAT6Ojwe\nuiGfmhsiDymPHKjARBNhoLfxe15vhq2XiIsRQ8ECgYEA0QmYmmoRG+wHTpzB41vG\nIJRY0Apdt4jaJ7DdNkAtl891kzDbQSWHbByGqEdr1+YW1sQ1faYg8xozGNcjfL8T\nIbiMAT5FtlMXFM9eMbwL/7ytX3mAgfdgTEtQ2PRtZ15gzp7brhujJcM1qCEAr6x7\nZbWfffwSUstX51/Tu168m+s=\n-----END PRIVATE KEY-----\n",
-  "client_email": "ahmad-991@vendingapp-392515.iam.gserviceaccount.com",
-  "client_id": "118193662085860412599",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ahmad-991%40vendingapp-392515.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
+# TEMP_KEY={
+#   "type": "service_account",
+#   "project_id": "vendingapp-392515",
+#   "private_key_id": "0be6093985315d571ba283c2a56b664a13b22a27",
+#   "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCxqxU67nXgJqKg\nYgilePd673K/8QA6EWnl3kRSxjOyDxK+0LWBUDmtVqHOEiZk92fRJPBs9crQ00GR\nWcYB3IK7xtKuE2RYJJbMDscrgfpHISsCBn9ChqEyz4LfUSM+lO7GFANxg3FBWpO4\nX75oiUpGQyE+oNZa3pCDlEuuQyF4DyehlFbpdFfiXcDjlgibUEQHvF3VzU3rzWW1\nahAzoB8zjOhCMZ3noUmnwkzPKAxb84nZCHLsZIPKlaVeQnJUs3NV6G3IniZPOByl\n7bEveZj5tRNNZZHseMRxrslAYsNalQcCagRr5mB9asxDxz2WBoSbxDuCj7W3k4D1\nQpZRKC7nAgMBAAECggEATmkWdA1EyZnTgRvy+/CArGlcB9j5hCcmSPRIzA08SHO9\njqg2yqzY36bRv0wkVMAZueRnFXd+vJ3XnKn1qOGkcvIDDh9x1DLFuKY3AX0aM2Uw\ngXLTnE0lfHK3rA43k0mQfavcfy8G/1RVyHO86Y7Z0FuVIvpB0BXUyrValzx6W2z8\niudwPeTfs89jfdGFen452QaQwlIsvDsKRTf0zBa936gTTfSB7jbI6DZKACNyn6k8\nve4wQCqbjx6wUowqTXI0O6yQ/ItNjOYEtO/qfTSJiZIUSOaLA/YuSuWhNls0kTSE\nGk6o8TIdpnUyLDjQyGHTeCPxdORHJKVlUDhcq9jB9QKBgQDXwg/uxfBuIsNmGEzv\nmT0K1QcX4oat+cSIJXMJihyzy2JRrvKChIZJM20Wh9KG4oAoiWPVZ7ZqWnLYq4O7\n2oHL/p2AAxrYwRgboymr9nuDkBOYwYWkE9RZ0cRwDySmZantfbUiyriQuUdZTEqA\nr67qIUu0N8y3VSMyvxMfvjpyowKBgQDSzlMOnzJ88TmTbMnWGW5PT1ZTpetXFdxb\nyaT8kBa1UmuJZDW6/VlLKAXVwEGInZO3xj8ErDtSqEVSvBQRb/iYM9nUg7C75MC/\nz4/czKFazG7HA6NjskfTGtZ/zN1q1j2DLrH+Zp3BUP06xv47P+G4Gk+ETmpBAHMc\nkxi2evKa7QKBgG0MpMjmOpMv9trPRXOEXBnxedhUogWky/SUGQSlTcSB83udlOzq\n1oSA/Y35sCqEqInUhyUBem1esdVZOwfjdN8KHcjpyNPtJKYzXYiQ1/SzCXSXu1gm\nvZl4MHUC8l832x8x/i9LjuV2/9zednl8Ukf79CtuWIYA/f1UHfJZT2lJAoGAMUCj\nhzcKxMZXfWpdffhTHZSbxs9tPNuOsKNcOOYxaAvptCAFrbqjsjuXoWlZ5mFqsfVP\no/fZpGZMTBhFWA2hN25l5pEeKcg4gJguNJha2qwI9daTxidRQLF0jEeBNAT6Ojwe\nuiGfmhsiDymPHKjARBNhoLfxe15vhq2XiIsRQ8ECgYEA0QmYmmoRG+wHTpzB41vG\nIJRY0Apdt4jaJ7DdNkAtl891kzDbQSWHbByGqEdr1+YW1sQ1faYg8xozGNcjfL8T\nIbiMAT5FtlMXFM9eMbwL/7ytX3mAgfdgTEtQ2PRtZ15gzp7brhujJcM1qCEAr6x7\nZbWfffwSUstX51/Tu168m+s=\n-----END PRIVATE KEY-----\n",
+#   "client_email": "ahmad-991@vendingapp-392515.iam.gserviceaccount.com",
+#   "client_id": "118193662085860412599",
+#   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#   "token_uri": "https://oauth2.googleapis.com/token",
+#   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+#   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ahmad-991%40vendingapp-392515.iam.gserviceaccount.com",
+#   "universe_domain": "googleapis.com"
+# }
 
 CREDS_FILE = 'creds.json'
 CREDS = Credentials.from_service_account_file('creds.json') 
@@ -53,7 +53,7 @@ class VM_Logic():
 
     def get_vm_list(self):
         """
-        Return a list of athe avaliable worksheets in VendingMachine workshhet (VM01) 
+        Return a list of the avaliable worksheets in VendingMachine workshhet (VM01) 
         """
         sheets_names=[]
         for spreadsheet in MACHINES_SHEET:
@@ -216,13 +216,49 @@ class VM_Admin(VM_Logic):
                 return [current_name , i]
             i += 1 
 
+# class VendingMachine():
+#     def __init__(self)
+
+class UI():
+    def __init__(self):
+        self.vm =''
+    
+    def clear(self):
+        if name == 'nt':
+            _ = system('cls')
+        else:
+            _ = system('clear') 
+
+    def intro(self):
+        self.clear()
+        print('Welcome to VenderApp.')
+        print('VenderApp as an application that imitates the work of several vending machines connected to a database.')
+        print('The user can create vending machines, service them, check stock and sales informations, and get alarms')
+        user_input = ' '
+        while user_input != '':
+            user_input= input('To start hit Enter\n')
+        self.clear()
+            
+    def role(self):
+        print('Choose a role')
+        print('1- User')
+        print('2- Admin')
+        while(True):
+            user_input = input('Enter 1 or 2\n')
+            if user_input == '1' or user_input == '2' :
+                self.clear()
+                return user_input
              
+          
+
 
 # test = VM_Logic()
 # print(test.get_vm_list())
-
-test2 = VM_Admin()
-test2.create_vm('new very long address')
+user = UI()
+user.intro()
+temp=user.role()
+# test2 = VM_Admin()
+# test2.create_vm('new very long address')
 # test2.get_data("vm01")
 # test2.update_alarms()
 
