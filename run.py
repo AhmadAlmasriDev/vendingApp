@@ -100,23 +100,36 @@ class Vending_Machine():
             if data[i][0] != current_date_time[0] :
                 # print(i)
                 # print(data[i])
-                data_slice= data[i:]
+                data_slice = data[i:]
                 count=[0 ,0 ,0 ,0]
-                prev_quantity=[data[i][3],data[i][4],data[i][5],data[i][6],]
-                temp_quantity=[]
+                prev_quantity =[data[i][3],data[i][4],data[i][5],data[i][6],]
+                temp_quantity =[]
                 for i in range(len(data_slice)):
                     if data_slice[i][2] == 'topup' :
-                        temp_quantity= [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6] ]                        
+                        temp_quantity = [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6] ]                        
                         for x in range(4):
                             count[x] += int(prev_quantity[x]) - int(temp_quantity[x])
-                        prev_quantity=[30,30,30,30]
-                    temp_quantity= [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6] ]    
+                        prev_quantity =[30,30,30,30]
+                    temp_quantity = [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6] ]    
                 for i in range(4):
                     count[i] += int(prev_quantity[i]) - int(temp_quantity[i])
                 
                 return count
 
-         
+    def update_sales(self):
+        def calculate_revenue():
+            price = [3, 4, 2, 5]
+            revenue = 0
+            for item, price in zip(sales, price):
+                revenue += item * price
+            return revenue
+
+        date_time = self.get_date_time()
+        sales = self.count_sales(self.name)
+        revenue = calculate_revenue()
+        current_row = [date_time[0], sales[0], sales[1], sales[2], sales[3], revenue]
+        current_vm = SALES_SHEET.worksheet(self.name)
+        current_vm.append_row(current_row)      
 
 
     def get_data(self,vm):
@@ -154,7 +167,7 @@ class Admin_VM(Vending_Machine):
     def name_avaliable_check(self):
         vm_list = self.get_vm_list()
         # print(len(vm_list))
-        i=1
+        i = 1
         while (True):
             current_name = f'vm{"0" + str(i) if i < 10 else i}'
             
@@ -167,11 +180,11 @@ class Admin_VM(Vending_Machine):
 # test = Vending_Machine()
 # print(test.get_vm_list())
 
-test2= Admin_VM()
+test2 = Admin_VM()
 # test2.create_vm()
 test2.get_data("vm01")
-sale = test2.count_sales("vm01")
-print(sale)
+test2.update_sales()
+
 # test2.update_vm('regular')
 # test2.delete_vm(1)
 # temp=test2.name_avaliable_check()
