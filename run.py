@@ -39,16 +39,18 @@ SHEETS_API_VERSION = 'v4'
 
 
 
-class Vending_Machine():
+class VM_Logic():
     def __init__(self):
-        self.adress = ""
+        self.address = ""
         self.name = ""
         self.mars = 0
         self.snickers = 0
         self.twix = 0
         self.bounty = 0
         self.cash = 0
-  
+        self.date=""
+        self.time=""
+
     def get_vm_list(self):
         """
         Return a list of athe avaliable worksheets in VendingMachine workshhet (VM01) 
@@ -133,32 +135,71 @@ class Vending_Machine():
 
 
     def get_data(self,vm):
+        time_date = self.get_date_time()
         v_machine = MACHINES_SHEET.worksheet(vm)
 
         data = v_machine.get_all_values()
         last_data = data[-1]
-        self.adress = data[0][1]
+        self.address = data[0][1]
         self.name = vm
         self.mars = int(last_data[3])
         self.snickers = int(last_data[4])
         self.twix = int(last_data[5])
         self.bounty = int(last_data[6])
         self.cash = float(last_data[7])
+        self.date = time_date[0]
+        self.time = time_date[1]
         # print(self.adress)
         
+    def check_stock(self):
+        alarms = []
+        near_empty='stock near empty (5pcs)'
+        stock_empty='stock empty'
+        if self.mars == 5 :
+           alarms.append(f'Mars {near_empty}')
+        if self.snickers == 5 :
+           alarms.append(f'Snickers {near_empty}')
+        if self.twix == 5 :
+           alarms.append(f'Twix {near_empty}')
+        if self.bounty == 5 :
+           alarms.append(f'Bounty {near_empty}')
+        if self.mars == 0 :
+           alarms.append(f'Mars {stock_empty}')
+        if self.snickers == 0 :
+           alarms.append(f'Snickers {stock_empty}')
+        if self.twix == 0 :
+           alarms.append(f'Twix {stock_empty}')
+        if self.bounty == 0 :
+           alarms.append(f'Bounty {stock_empty}')
 
-class Admin_VM(Vending_Machine):
+        alarm_rows= [[self.date, self.time, item, self.address] for item in alarms]
+        return alarm_rows
+
+    def update_alarms(self):
+        current_vm = ALARM_SHEET.worksheet('Alarms')
+        rows = self.check_stock()
+        for row in rows:
+            current_vm.append_row(row)      
+
+
+class VM_Admin(VM_Logic):
     def __init__(self):
         super()
 
-    def create_vm(self):
-        
+    def create_vm(self,address):
         name_index = self.name_avaliable_check()
-
+        self.address = address
         MACHINES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
+        machines= MACHINES_SHEET.worksheet(name_index[0])
+        machines.update('B1',address)
+
         SALES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
+        sales= SALES_SHEET.worksheet(name_index[0])
+        sales.update('B1',address)
         self.get_data(name_index[0])
         self.update_vm('initialize')
+        
+
     
     def delete_vm(self, name):
         worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
@@ -177,13 +218,13 @@ class Admin_VM(Vending_Machine):
 
              
 
-# test = Vending_Machine()
+# test = VM_Logic()
 # print(test.get_vm_list())
 
-test2 = Admin_VM()
-# test2.create_vm()
-test2.get_data("vm01")
-test2.update_sales()
+test2 = VM_Admin()
+test2.create_vm('new very long address')
+# test2.get_data("vm01")
+# test2.update_alarms()
 
 # test2.update_vm('regular')
 # test2.delete_vm(1)
