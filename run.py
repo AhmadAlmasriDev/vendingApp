@@ -248,15 +248,30 @@ class UI():
             if user_input == '1' or user_input == '2' :
                 self.clear()
                 return user_input
-             
-          
 
-
-# test = VM_Logic()
+    def select_machine(self):
+        avaliable_machines = vm.get_vm_list()
+        if len(avaliable_machines) != 0 :
+            print('Select a vending machine')
+            print('Just input th machine name (example vm01)')
+            print('These are the machines avaliable:') 
+            print(avaliable_machines) 
+            while(True):
+                user_input = input ('Enter machine name\n')
+                for name in avaliable_machines:
+                    if name == user_input:
+                        self.clear()
+                        return user_input
+                print ('Please, choose a name from the list.')
+        else:
+            print('There are no machines found.\nYou can create new machines as an Admin')
+            # GO BACK TO THE START
+            
+vm = VM_Logic()
 # print(test.get_vm_list())
 user = UI()
 user.intro()
-temp=user.role()
+temp=user.select_machine()
 # test2 = VM_Admin()
 # test2.create_vm('new very long address')
 # test2.get_data("vm01")
@@ -266,7 +281,7 @@ temp=user.role()
 # test2.delete_vm(1)
 # temp=test2.name_avaliable_check()
 
-# print(temp)
+print(temp)
 # print(test2.get_vm_list())
 
 # machines = MACHINES_SHEET.worksheet('vm01')
