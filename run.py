@@ -4,6 +4,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import datetime as dt
 
+# Constants------------------------------------------------------------------------------
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -49,6 +50,9 @@ class Vending_Machine():
         self.cash = 0
   
     def get_vm_list(self):
+        """
+        Return a list of athe avaliable worksheets in VendingMachine workshhet (VM01) 
+        """
         sheets_names=[]
         for spreadsheet in MACHINES_SHEET:
             sheets_names.append(spreadsheet.title) 
@@ -56,35 +60,65 @@ class Vending_Machine():
         v_machines_list.sort()
         return v_machines_list
 
-    def update_vm(self, operation):
-        self.get_data(self.name)
+    def get_date_time(self):
         date_time = dt.datetime.now()
         date = date_time.strftime("%Y-%m-%d")
         time = date_time.strftime("%H:%M")
+        return [date,time]
+    
+    def update_vm(self, operation):
+        def upload_data():
+            current_row = [date_time[0], date_time[1], operation, self.mars, self.snickers, self.twix, self.bounty, self.cash]
+            current_vm = MACHINES_SHEET.worksheet(self.name)
+            current_vm.append_row(current_row) 
+
+        self.get_data(self.name)
+        date_time = self.get_date_time()
 
         if operation == 'initialize':
             self.mars = self.snickers = self.twix = self.bounty = 30
             self.cash = 0
+            upload_data()
         elif operation == 'cashing':
             self.cash = 0
+            upload_data()
         elif operation == 'topup':
             self.mars = self.snickers = self.twix = self.bounty = 30
+            upload_data()
+        elif operation == 'regular':
+            upload_data()
+            
         
-        current_row = [date, time, operation, self.mars, self.snickers, self.twix, self.bounty, self.cash]
-        current_vm = MACHINES_SHEET.worksheet(self.name)
-        current_vm.append_row(current_row) 
-
-        # match operation:
-        #     case 'initialize':
-        #         mars = snickers = twix = bounty = 30
-        #         cash = 0
-        #     case 'cashing':
-        #         cash = 0
-        #     case 'topup':
-        #         mars = snickers = twix = bounty = 30
-        #     case_:
-        #         print("no")
+    
+    def count_sales(self,vm):
+        current_date_time = self.get_date_time()
+        raw_info = MACHINES_SHEET.worksheet(vm)
+        data = raw_info.get_all_values()
+        for i in reversed(range(len(data))):
+            prev_quantity = []
+            data_slice = []
+            if data[i][0] != current_date_time[0] :
+                # print(i)
+                # print(data[i])
+                data_slice= data[i:]
+                count=[0 ,0 ,0 ,0]
+                prev_quantity=[data[i][3],data[i][4],data[i][5],data[i][6],]
+                temp_quantity=[]
+                for i in range(len(data_slice)):
+                    if data_slice[i][2] == 'topup' :
+                        temp_quantity= [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6] ]                        
+                        for x in range(4):
+                            count[x] += int(prev_quantity[x]) - int(temp_quantity[x])
+                        prev_quantity=[30,30,30,30]
+                    temp_quantity= [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6] ]    
+                for i in range(4):
+                    count[i] += int(prev_quantity[i]) - int(temp_quantity[i])
                 
+                return count
+
+         
+
+
     def get_data(self,vm):
         v_machine = MACHINES_SHEET.worksheet(vm)
 
@@ -92,11 +126,11 @@ class Vending_Machine():
         last_data = data[-1]
         self.adress = data[0][1]
         self.name = vm
-        self.mars = last_data[3]
-        self.snickers = last_data[4]
-        self.twix = last_data[5]
-        self.bounty = last_data[6]
-        self.cash = last_data[7]
+        self.mars = int(last_data[3])
+        self.snickers = int(last_data[4])
+        self.twix = int(last_data[5])
+        self.bounty = int(last_data[6])
+        self.cash = float(last_data[7])
         # print(self.adress)
         
 
@@ -107,12 +141,14 @@ class Admin_VM(Vending_Machine):
     def create_vm(self):
         
         name_index = self.name_avaliable_check()
-        # print(twix)
 
         MACHINES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
+        SALES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
+        self.get_data(name_index[0])
+        self.update_vm('initialize')
     
-    def delete_vm(self, number):
-        worksheet_to_del = MACHINES_SHEET.worksheet(f'vm{"0"+str(number) if number < 10 else number}')
+    def delete_vm(self, name):
+        worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
         MACHINES_SHEET.del_worksheet(worksheet_to_del)
     
     def name_avaliable_check(self):
@@ -134,7 +170,9 @@ class Admin_VM(Vending_Machine):
 test2= Admin_VM()
 # test2.create_vm()
 test2.get_data("vm01")
-test2.update_vm('initialize')
+sale = test2.count_sales("vm01")
+print(sale)
+# test2.update_vm('regular')
 # test2.delete_vm(1)
 # temp=test2.name_avaliable_check()
 
