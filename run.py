@@ -190,11 +190,6 @@ class VM_Logic:
         for row in rows:
             current_vm.append_row(row)      
 
-
-class VM_Admin(VM_Logic):
-    def __init__(self):
-        super()
-
     def create_vm(self,address):
         name_index = self.name_avaliable_check()
         self.address = address
@@ -208,8 +203,6 @@ class VM_Admin(VM_Logic):
         sales.update('B1',address)
         self.update_vm('initialize')
         self.get_data(name_index[0])
-        
-
     
     def delete_vm(self, name):
         worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
@@ -225,6 +218,21 @@ class VM_Admin(VM_Logic):
             if current_name not in vm_list:
                 return [current_name , i]
             i += 1 
+class Admin():
+    def __init__(self,ui,vm_logic):
+        self.ui = ui
+        self.vm_logic = vm_logic
+    def admin_machines(self):
+        option = self.ui.admin_menu()
+        if option == "1":
+            address = self.ui.address()
+            self.vm_logic.create_vm(address) 
+            self.ui.feed_back('add')   
+        else:
+            avaliable_machines = self.vm_logic.get_vm_list()
+            vm_name = self.ui.select_machine(avaliable_machines)
+            self.vm_logic.delete_vm(vm_name)
+            self.ui.feed_back('')
 
 class VendingMachine():
     def __init__(self,ui,vm_logic):
@@ -265,7 +273,9 @@ class VendingMachine():
         if option == '2':
             self.vm_logic.update_vm('cashing')
 
-class UI():
+
+
+class VM_UI():
     def __init__(self):
         self.vm =''
     
@@ -357,15 +367,46 @@ class UI():
         
         while(True):
             user_input = input('Enter 1 - 2\n')
-            for i in range(1,2): 
+            for i in range(1,3): 
                 if int(user_input) == i:
                    
                     return user_input
             print('Please, choose from the menu.')
-ui = UI()
+
+    def admin_menu(self):
+        self.clear()
+        print ('Choose an option:')
+        print ('1- Create new vending machine')
+        print ('2- Delete a vending machine')
+        while(True):
+            user_input = input('Select:\n')
+            for i in range(1,3):
+                if int(user_input) == i:
+                    return user_input
+            print('Please, choose from the menu.')
+    def address(self):
+        self.clear()
+        while(True):
+            user_input = input ('Enter an adress.\n')
+            if user_input !='' or user_input !=' ' :
+                return user_input
+        print('Enter valid address, please.')
+
+    def feed_back(self,option):
+        self.clear()
+        if option == 'add':
+            print('Vending machine added successfully.')
+            sleep(3)
+        else:
+            print('Vending machine deleted successfully.')
+            sleep(3)
+
+ui = VM_UI()
 vm_logic = VM_Logic() 
-cur_vm = VendingMachine(ui , vm_logic)
-cur_vm.sell()
+cur_admin = Admin(ui , vm_logic)
+cur_admin.admin_machines()
+# cur_vm = VendingMachine(ui , vm_logic)
+# cur_vm.sell()
 
 
 # vm = VM_Logic()
