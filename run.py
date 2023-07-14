@@ -354,7 +354,8 @@ class VM_UI():
         while(True):
             user_input = input('Enter 1 or 2\n')
             for i in range(1,3):
-                if int(user_input) == i :
+                
+                if  user_input.isnumeric() and int(user_input) == i :
                     # self.vm = user_input
                     return user_input
 
@@ -389,8 +390,7 @@ class VM_UI():
         while(True):
             user_input = input('Enter 1 - 5\n')
             for i in range(1,6): 
-                if int(user_input) == i:
-                    
+                if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose from the menu.')
 
@@ -403,7 +403,7 @@ class VM_UI():
         while(True):
             user_input = input('Enter 1 or 2\n')
             for i in range(1,3): 
-                if int(user_input) == i:
+                if user_input.isnumeric() and int(user_input) == i:
                    
                     return user_input
             print('Please, choose from the menu.')
@@ -416,14 +416,15 @@ class VM_UI():
         while(True):
             user_input = input('Enter 1 or 2\n')
             for i in range(1,3):
-                if int(user_input) == i:
+                if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose from the menu.')
     def address(self):
         self.clear()
         while(True):
             user_input = input ('Enter an adress.\n')
-            if user_input !='' or user_input !=' ' :
+            # if user_input.strip() != '' and user_input !='' :
+            if user_input.strip() != '':
                 return user_input
         print('Enter valid address, please.')
 
