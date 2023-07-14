@@ -4,6 +4,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 import datetime as dt
 from os import system, name
+from time import sleep
 # Constants------------------------------------------------------------------------------
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -245,7 +246,18 @@ class UI():
         while user_input != '':
             user_input= input('To start hit Enter\n')
         self.clear()
-            
+
+    def outro(self,op_type):
+        if op_type == "buy":
+            print('Thank You, for your purchase.')        
+            print('Have a nice day')   
+            sleep(3)
+        if op_type == 'maintain':
+            print('Maintenence finished')
+            print('Back to main menu')
+            sleep(3)
+        # GO BACK TO MAIN MENU#    
+
     def role(self):
         print('Choose a role')
         print('1- User')
@@ -288,13 +300,27 @@ class UI():
                 if int(user_input) == i:
                     self.clear()
                     return user_input
-            print('Please choose a choice from the menu')
+            print('Please, choose from the menu.')
+
+    def maintenance_menu(self):
+        print('Select:\n')
+        print(f'1- Topup')
+        print(f'2- Cashing\n')
+        
+        while(True):
+            user_input = input('Enter 1 - 2\n')
+            for i in range(1,2): 
+                if int(user_input) == i:
+                    self.clear()
+                    return user_input
+            print('Please, choose from the menu.')
 
 vm = VM_Logic()
 # print(test.get_vm_list())
 user = UI()
 user.intro()
 temp=user.machine_menu('vm01')
+user.outro("maintain")
 # test2 = VM_Admin()
 # test2.create_vm('new very long address')
 # test2.get_data("vm01")
