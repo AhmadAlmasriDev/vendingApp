@@ -47,7 +47,7 @@ PRICE_BOUNTY = 4
 
 
 
-class VM_Logic():
+class VM_Logic:
     def __init__(self):
         self.address = ""
         self.name = ""
@@ -104,11 +104,12 @@ class VM_Logic():
     def count_sales(self,vm):
         current_date_time = self.get_date_time()
         raw_info = MACHINES_SHEET.worksheet(vm)
-        data = raw_info.get_all_values()
+        data = raw_info.get_all_values()[3:]
+        # print(data)
         for i in reversed(range(len(data))):
             prev_quantity = []
             data_slice = []
-            if data[i][0] != current_date_time[0] :
+            if data[i][0] != current_date_time[0] or i == 0:
                 # print(i)
                 # print(data[i])
                 data_slice = data[i:]
@@ -116,12 +117,12 @@ class VM_Logic():
                 prev_quantity =[data[i][3],data[i][4],data[i][5],data[i][6],]
                 temp_quantity =[]
                 for i in range(len(data_slice)):
-                    if data_slice[i][2] == 'topup' :
-                        temp_quantity = [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6] ]                        
+                    if data_slice[i][2] == 'topup':
+                        temp_quantity = [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6]]                        
                         for x in range(4):
                             count[x] += int(prev_quantity[x]) - int(temp_quantity[x])
-                        prev_quantity =[30,30,30,30]
-                    temp_quantity = [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6] ]    
+                        prev_quantity =[MAX_STOCK, MAX_STOCK, MAX_STOCK, MAX_STOCK]
+                    temp_quantity = [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6]]    
                 for i in range(4):
                     count[i] += int(prev_quantity[i]) - int(temp_quantity[i])
                 
@@ -197,6 +198,7 @@ class VM_Admin(VM_Logic):
     def create_vm(self,address):
         name_index = self.name_avaliable_check()
         self.address = address
+        self.name = name_index[0]
         MACHINES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
         machines= MACHINES_SHEET.worksheet(name_index[0])
         machines.update('B1',address)
@@ -204,8 +206,8 @@ class VM_Admin(VM_Logic):
         SALES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
         sales= SALES_SHEET.worksheet(name_index[0])
         sales.update('B1',address)
-        self.get_data(name_index[0])
         self.update_vm('initialize')
+        self.get_data(name_index[0])
         
 
     
@@ -224,8 +226,37 @@ class VM_Admin(VM_Logic):
                 return [current_name , i]
             i += 1 
 
-# class VendingMachine():
-#     def __init__(self)
+class VendingMachine():
+    def __init__(self,ui,vm_logic):
+        self.ui = ui
+        self.vm_logic = vm_logic
+
+    def sell(self):
+        current_vm = self.ui.select_machine(self.vm_logic.get_vm_list())
+        if current_vm != False:
+            self.vm_logic.get_data(current_vm)
+            vm_option = self.ui.machine_menu()
+            if vm_option == '5':
+                maintain_option = self.ui.maintenance_menu()
+                self.maintain(maintain_option)
+            else:
+                if vm_option == '1':
+                    self.vm_logic.mars -= 1
+                if vm_option == '2':
+                    self.vm_logic.snickers -= 1
+                if vm_option == '3':
+                    self.vm_logic.twix -= 1
+                if vm_option == '4':
+                    self.vm_logic.bounty -= 1
+                self.vm_logic.update_vm('sell')
+                self.vm_logic.update_sales()
+                self.vm_logic.update_alarms()
+
+    def maintain(self,option):                
+        if option == '1':
+            self.vm_logic.update_vm('topup')
+        if option == '2':
+            self.vm_logic.update_vm('cashing')
 
 class UI():
     def __init__(self):
@@ -266,10 +297,11 @@ class UI():
             user_input = input('Enter 1 or 2\n')
             if user_input == '1' or user_input == '2' :
                 self.clear()
+                self.vm = user_input
                 return user_input
 
-    def select_machine(self):
-        avaliable_machines = vm.get_vm_list()
+    def select_machine(self,avaliable_machines):
+        
         if len(avaliable_machines) != 0 :
             print('Select a vending machine')
             print('Just input th machine name (example vm01)')
@@ -284,10 +316,11 @@ class UI():
                 print ('Please, choose a name from the list.')
         else:
             print('There are no machines found.\nYou can create new machines as an Admin')
-            # GO BACK TO THE START
+            sleep(3)
+            return False
 
-    def machine_menu(self,vm):
-        print(f'Vending machine {vm}') 
+    def machine_menu(self):
+        print(f'Vending machine {self.vm}') 
         print('Select a product:\n')
         print(f'1- Mars -------- {PRICE_MARS}$')
         print(f'2- Snickers ---- {PRICE_SNICKERS}$')
@@ -314,13 +347,18 @@ class UI():
                     self.clear()
                     return user_input
             print('Please, choose from the menu.')
+ui = UI()
+vm_logic = VM_Logic() 
+cur_vm = VendingMachine(ui , vm_logic)
+cur_vm.sell()
 
-vm = VM_Logic()
+
+# vm = VM_Logic()
 # print(test.get_vm_list())
-user = UI()
-user.intro()
-temp=user.machine_menu('vm01')
-user.outro("maintain")
+# user = UI()
+# user.intro()
+# temp=user.machine_menu('vm01')
+# user.outro("maintain")
 # test2 = VM_Admin()
 # test2.create_vm('new very long address')
 # test2.get_data("vm01")
@@ -330,7 +368,7 @@ user.outro("maintain")
 # test2.delete_vm(1)
 # temp=test2.name_avaliable_check()
 
-print(temp)
+# print(temp)
 # print(test2.get_vm_list())
 
 # machines = MACHINES_SHEET.worksheet('vm01')
