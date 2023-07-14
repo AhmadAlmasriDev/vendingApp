@@ -94,11 +94,15 @@ class VM_Logic:
             upload_data()
         elif operation == 'topup':
             self.mars = self.snickers = self.twix = self.bounty = MAX_STOCK
+            self.del_alarms()
             upload_data()
         elif operation == 'sell':
             upload_data()
-        
 
+    def del_alarms(self):
+        current_vm = ALARM_SHEET.worksheet(self.name)
+        data = current_vm.get_all_values()
+        current_vm.delete_rows(4, len(data))     
         
     
     def count_sales(self,vm):
@@ -145,7 +149,7 @@ class VM_Logic:
 
 
     def get_data(self,vm):
-        time_date = self.get_date_time()
+        # time_date = self.get_date_time()
         v_machine = MACHINES_SHEET.worksheet(vm)
 
         data = v_machine.get_all_values()
@@ -157,10 +161,11 @@ class VM_Logic:
         self.twix = int(last_data[5])
         self.bounty = int(last_data[6])
         self.cash = float(last_data[7])
-        self.date = time_date[0]
+        # self.date = time_date[0]
         # self.time = time_date[1]
         
     def check_stock(self):
+        current_date_time = self.get_date_time()
         alarms = []
         near_empty='stock near empty (5pcs)'
         stock_empty='stock empty'
@@ -181,11 +186,11 @@ class VM_Logic:
         if self.bounty == 0 :
            alarms.append(f'Bounty {stock_empty}')
 
-        alarm_rows= [[self.date, self.time, item, self.address] for item in alarms]
+        alarm_rows= [[current_date_time[0], current_date_time[1], item, self.address] for item in alarms]
         return alarm_rows
 
     def update_alarms(self):
-        current_vm = ALARM_SHEET.worksheet('Alarms')
+        current_vm = ALARM_SHEET.worksheet(self.name)
         rows = self.check_stock()
         for row in rows:
             current_vm.append_row(row)      
@@ -196,17 +201,29 @@ class VM_Logic:
         self.name = name_index[0]
         MACHINES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
         machines= MACHINES_SHEET.worksheet(name_index[0])
-        machines.update('B1',address)
+        # machines.update('B1',address)
+        machines.update_acell('B1', address)
 
         SALES_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
         sales= SALES_SHEET.worksheet(name_index[0])
-        sales.update('B1',address)
+        # sales.update('B1',address)
+        sales.update_acell('B1', address)
+            
+        ALARM_SHEET.duplicate_sheet(0,new_sheet_name=f'{name_index[0]}',insert_sheet_index = name_index[1])
+        alarms= ALARM_SHEET.worksheet(name_index[0])
+        # sales.update('B1',address)
+        alarms.update_acell('B1', address)
         self.update_vm('initialize')
         self.get_data(name_index[0])
-    
+
     def delete_vm(self, name):
         worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
         MACHINES_SHEET.del_worksheet(worksheet_to_del)
+        worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
+        SALES_SHEET.del_worksheet(worksheet_to_del)
+        worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
+        SALES_SHEET.del_worksheet(worksheet_to_del)
+
     
     def name_avaliable_check(self):
         vm_list = self.get_vm_list()
@@ -248,36 +265,54 @@ class VendingMachine():
                 maintain_option = self.ui.maintenance_menu()
                 self.maintain(maintain_option)
             else:
-                if self.vm_logic.mars == 0 or self.vm_logic.snickers == 0 or self.vm_logic.twix == 0 or self.vm_logic.bounty:
-                    self.ui.out_of_stock()
-                else:
-                    if vm_option == '1':
+                # if self.vm_logic.mars == 0 or self.vm_logic.snickers == 0 or self.vm_logic.twix == 0 or self.vm_logic.bounty:
+                #     self.ui.outro('out')
+                
+                if vm_option == '1':
+                    if self.vm_logic.mars != 0 :
                         self.vm_logic.mars -= 1
                         self.vm_logic.cash += PRICE_MARS
-                    if vm_option == '2':
+                        state = 'buy'
+                    else:
+                        state = 'out'
+                if vm_option == '2':
+                    if self.vm_logic.snickers != 0:
                         self.vm_logic.snickers -= 1
                         self.vm_logic.cash += PRICE_SNICKERS
-                    if vm_option == '3':
+                        state = 'buy'
+                    else:
+                        state = 'out'
+                if vm_option == '3':
+                    if self.vm_logic.twix != 0:
                         self.vm_logic.twix -= 1
                         self.vm_logic.cash += PRICE_TWIX
-                    if vm_option == '4':
+                        state = 'buy'
+                    else:
+                        state = 'out'
+                if vm_option == '4':
+                    if self.vm_logic.bounty != 0:
                         self.vm_logic.bounty -= 1
                         self.vm_logic.cash += PRICE_BOUNTY
+                        state = 'buy'
+                    else:
+                        state = 'out'
+                if state == 'buy':
                     self.vm_logic.update_vm('sell')
                     self.vm_logic.update_sales()
                     self.vm_logic.update_alarms()
+                self.ui.outro(state)
 
     def maintain(self,option):                
         if option == '1':
             self.vm_logic.update_vm('topup')
         if option == '2':
             self.vm_logic.update_vm('cashing')
-
+        self.ui.outro('maintain')
 
 
 class VM_UI():
     def __init__(self):
-        self.vm =''
+        self.name =''
     
     def clear(self):
         if name == 'nt':
@@ -301,40 +336,40 @@ class VM_UI():
             print('Thank You, for your purchase.')        
             print('Have a nice day')   
             sleep(3)
-        if op_type == 'maintain':
+        if op_type == "maintain":
             print('Maintenence finished')
             print('Back to main menu')
             sleep(3)
+        if op_type == "out":
+            print('Sorry!')
+            print('We are out of stock.')
+            sleep(3)
         # GO BACK TO MAIN MENU#    
-    def out_of_stock(self):
-        self.clear()
-        print('Sorry!')
-        print('We are out of stock.')
 
     def role(self):
         self.clear()
-        print('Choose a role')
-        print('1- User')
-        print('2- Admin')
+        print('Choose an option:\n')
+        print('1- Vending machine')
+        print('2- Admin\n')
         while(True):
             user_input = input('Enter 1 or 2\n')
-            if user_input == '1' or user_input == '2' :
-                self.clear()
-                self.vm = user_input
-                return user_input
+            for i in range(1,3):
+                if int(user_input) == i :
+                    # self.vm = user_input
+                    return user_input
 
     def select_machine(self,avaliable_machines):
         self.clear()
         if len(avaliable_machines) != 0 :
             print('Select a vending machine')
-            print('Just input th machine name (example vm01)')
+            print('Just type the machine name (example vm01)')
             print('These are the machines avaliable at the moment:') 
             print(avaliable_machines) 
             while(True):
-                user_input = input ('Enter machine name\n')
+                user_input = input ('\nEnter machine name:\n')
                 for name in avaliable_machines:
                     if name == user_input:
-                        
+                        self.name = user_input
                         return user_input
                 print ('Please, choose a name from the list.')
         else:
@@ -344,7 +379,7 @@ class VM_UI():
 
     def machine_menu(self):
         self.clear()
-        print(f'Vending machine {self.vm}') 
+        print(f'Vending machine {self.name}\n') 
         print('Select a product:\n')
         print(f'1- Mars -------- {PRICE_MARS}$')
         print(f'2- Snickers ---- {PRICE_SNICKERS}$')
@@ -366,7 +401,7 @@ class VM_UI():
         print(f'2- Cashing\n')
         
         while(True):
-            user_input = input('Enter 1 - 2\n')
+            user_input = input('Enter 1 or 2\n')
             for i in range(1,3): 
                 if int(user_input) == i:
                    
@@ -375,11 +410,11 @@ class VM_UI():
 
     def admin_menu(self):
         self.clear()
-        print ('Choose an option:')
+        print ('Choose an option:\n')
         print ('1- Create new vending machine')
-        print ('2- Delete a vending machine')
+        print ('2- Delete a vending machine\n')
         while(True):
-            user_input = input('Select:\n')
+            user_input = input('Enter 1 or 2\n')
             for i in range(1,3):
                 if int(user_input) == i:
                     return user_input
@@ -401,10 +436,26 @@ class VM_UI():
             print('Vending machine deleted successfully.')
             sleep(3)
 
-ui = VM_UI()
-vm_logic = VM_Logic() 
-cur_admin = Admin(ui , vm_logic)
-cur_admin.admin_machines()
+def main():
+    while(True):
+        ui = VM_UI()
+        vm_logic = VM_Logic()
+        admin= Admin(ui , vm_logic)
+        vm = VendingMachine(ui , vm_logic)
+        ui.intro()
+        user_input = ui.role()
+        if user_input == '1':
+            vm.sell()
+        else:
+            admin.admin_machines()
+
+
+main()
+
+# ui = VM_UI()
+# vm_logic = VM_Logic() 
+# cur_admin = Admin(ui , vm_logic)
+# cur_admin.admin_machines()
 # cur_vm = VendingMachine(ui , vm_logic)
 # cur_vm.sell()
 
