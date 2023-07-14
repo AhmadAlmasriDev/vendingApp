@@ -37,6 +37,13 @@ ALARM_SHEET_ID = '1JJfoOBQzP3t4PFv2pj6MkkTAolq6V9nA3o1Q2dzmgvU'
 SHEETS_API_NAME = 'sheets'
 SHEETS_API_VERSION = 'v4'
 
+MAX_STOCK = 10
+PRICE_MARS = 3
+PRICE_SNICKERS = 4
+PRICE_TWIX = 2
+PRICE_BOUNTY = 4
+
+
 
 
 class VM_Logic():
@@ -74,22 +81,23 @@ class VM_Logic():
             current_vm = MACHINES_SHEET.worksheet(self.name)
             current_vm.append_row(current_row) 
 
-        self.get_data(self.name)
+        # self.get_data(self.name)
         date_time = self.get_date_time()
 
         if operation == 'initialize':
-            self.mars = self.snickers = self.twix = self.bounty = 30
+            self.mars = self.snickers = self.twix = self.bounty = MAX_STOCK
             self.cash = 0
             upload_data()
         elif operation == 'cashing':
             self.cash = 0
             upload_data()
         elif operation == 'topup':
-            self.mars = self.snickers = self.twix = self.bounty = 30
+            self.mars = self.snickers = self.twix = self.bounty = MAX_STOCK
             upload_data()
-        elif operation == 'regular':
+        elif operation == 'sell':
             upload_data()
-            
+        
+
         
     
     def count_sales(self,vm):
@@ -120,7 +128,7 @@ class VM_Logic():
 
     def update_sales(self):
         def calculate_revenue():
-            price = [3, 4, 2, 5]
+            price = [PRICE_MARS, PRICE_SNICKERS, PRICE_TWIX, PRICE_BOUNTY]
             revenue = 0
             for item, price in zip(sales, price):
                 revenue += item * price
@@ -148,8 +156,7 @@ class VM_Logic():
         self.bounty = int(last_data[6])
         self.cash = float(last_data[7])
         self.date = time_date[0]
-        self.time = time_date[1]
-        # print(self.adress)
+        # self.time = time_date[1]
         
     def check_stock(self):
         alarms = []
@@ -254,7 +261,7 @@ class UI():
         if len(avaliable_machines) != 0 :
             print('Select a vending machine')
             print('Just input th machine name (example vm01)')
-            print('These are the machines avaliable:') 
+            print('These are the machines avaliable at the moment:') 
             print(avaliable_machines) 
             while(True):
                 user_input = input ('Enter machine name\n')
@@ -266,12 +273,28 @@ class UI():
         else:
             print('There are no machines found.\nYou can create new machines as an Admin')
             # GO BACK TO THE START
-            
+
+    def machine_menu(self,vm):
+        print(f'Vending machine {vm}') 
+        print('Select a product:\n')
+        print(f'1- Mars -------- {PRICE_MARS}$')
+        print(f'2- Snickers ---- {PRICE_SNICKERS}$')
+        print(f'3- Twix -------- {PRICE_TWIX}$')
+        print(f'4- Bounty ------ {PRICE_BOUNTY}$')
+        print('5- Maintenance\n')
+        while(True):
+            user_input = input('Enter 1 - 5\n')
+            for i in range(1,6): 
+                if int(user_input) == i:
+                    self.clear()
+                    return user_input
+            print('Please choose a choice from the menu')
+
 vm = VM_Logic()
 # print(test.get_vm_list())
 user = UI()
 user.intro()
-temp=user.select_machine()
+temp=user.machine_menu('vm01')
 # test2 = VM_Admin()
 # test2.create_vm('new very long address')
 # test2.get_data("vm01")
