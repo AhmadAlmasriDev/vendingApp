@@ -240,17 +240,24 @@ class VendingMachine():
                 maintain_option = self.ui.maintenance_menu()
                 self.maintain(maintain_option)
             else:
-                if vm_option == '1':
-                    self.vm_logic.mars -= 1
-                if vm_option == '2':
-                    self.vm_logic.snickers -= 1
-                if vm_option == '3':
-                    self.vm_logic.twix -= 1
-                if vm_option == '4':
-                    self.vm_logic.bounty -= 1
-                self.vm_logic.update_vm('sell')
-                self.vm_logic.update_sales()
-                self.vm_logic.update_alarms()
+                if self.vm_logic.mars == 0 or self.vm_logic.snickers == 0 or self.vm_logic.twix == 0 or self.vm_logic.bounty:
+                    self.ui.out_of_stock()
+                else:
+                    if vm_option == '1':
+                        self.vm_logic.mars -= 1
+                        self.vm_logic.cash += PRICE_MARS
+                    if vm_option == '2':
+                        self.vm_logic.snickers -= 1
+                        self.vm_logic.cash += PRICE_SNICKERS
+                    if vm_option == '3':
+                        self.vm_logic.twix -= 1
+                        self.vm_logic.cash += PRICE_TWIX
+                    if vm_option == '4':
+                        self.vm_logic.bounty -= 1
+                        self.vm_logic.cash += PRICE_BOUNTY
+                    self.vm_logic.update_vm('sell')
+                    self.vm_logic.update_sales()
+                    self.vm_logic.update_alarms()
 
     def maintain(self,option):                
         if option == '1':
@@ -276,9 +283,10 @@ class UI():
         user_input = ' '
         while user_input != '':
             user_input= input('To start hit Enter\n')
-        self.clear()
+        
 
     def outro(self,op_type):
+        self.clear()
         if op_type == "buy":
             print('Thank You, for your purchase.')        
             print('Have a nice day')   
@@ -288,8 +296,13 @@ class UI():
             print('Back to main menu')
             sleep(3)
         # GO BACK TO MAIN MENU#    
+    def out_of_stock(self):
+        self.clear()
+        print('Sorry!')
+        print('We are out of stock.')
 
     def role(self):
+        self.clear()
         print('Choose a role')
         print('1- User')
         print('2- Admin')
@@ -301,7 +314,7 @@ class UI():
                 return user_input
 
     def select_machine(self,avaliable_machines):
-        
+        self.clear()
         if len(avaliable_machines) != 0 :
             print('Select a vending machine')
             print('Just input th machine name (example vm01)')
@@ -311,7 +324,7 @@ class UI():
                 user_input = input ('Enter machine name\n')
                 for name in avaliable_machines:
                     if name == user_input:
-                        self.clear()
+                        
                         return user_input
                 print ('Please, choose a name from the list.')
         else:
@@ -320,6 +333,7 @@ class UI():
             return False
 
     def machine_menu(self):
+        self.clear()
         print(f'Vending machine {self.vm}') 
         print('Select a product:\n')
         print(f'1- Mars -------- {PRICE_MARS}$')
@@ -331,11 +345,12 @@ class UI():
             user_input = input('Enter 1 - 5\n')
             for i in range(1,6): 
                 if int(user_input) == i:
-                    self.clear()
+                    
                     return user_input
             print('Please, choose from the menu.')
 
     def maintenance_menu(self):
+        self.clear()
         print('Select:\n')
         print(f'1- Topup')
         print(f'2- Cashing\n')
@@ -344,7 +359,7 @@ class UI():
             user_input = input('Enter 1 - 2\n')
             for i in range(1,2): 
                 if int(user_input) == i:
-                    self.clear()
+                   
                     return user_input
             print('Please, choose from the menu.')
 ui = UI()
