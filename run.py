@@ -279,7 +279,7 @@ class VM_Logic:
         worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
         SALES_SHEET.del_worksheet(worksheet_to_del)
         worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
-        SALES_SHEET.del_worksheet(worksheet_to_del)
+        ALARM_SHEET.del_worksheet(worksheet_to_del)
 
     def name_avaliable_check(self):
         """
@@ -400,12 +400,12 @@ class VM_UI():
         self.clear()
         print('Welcome to VenderApp.')
         print(
-            'VenderApp as an application that imitates the work ' +
+            'VenderApp is an application that imitates the work ' +
             'of several vending machines connected to a database.'
              )
         print(
             'The user can create vending machines, service them, ' +
-            'check stock and sales informations, and get alarms'
+            'check stock and sales information, and get alarms'
              )
         user_input = ' '
         while user_input != '':
@@ -545,12 +545,12 @@ def main():
     """
     The main function to initialize the code
     """
+    ui = VM_UI()
+    ui.intro()
     while (True):
-        ui = VM_UI()
         vm_logic = VM_Logic()
         admin = Admin(ui, vm_logic)
         vm = VendingMachine(ui, vm_logic)
-        ui.intro()
         user_input = ui.role()
         if user_input == '1':
             vm.sell()
