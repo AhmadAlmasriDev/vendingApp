@@ -1,12 +1,10 @@
 import gspread
-from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
 import datetime as dt
 from os import system, name
 from time import sleep
 
-# Constants------------------------------------------------------------------------------
+# Constants---------------------------------------------------------------
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -14,13 +12,13 @@ SCOPE = [
     ]
 
 CREDS_FILE = 'creds.json'
-CREDS = Credentials.from_service_account_file('creds.json') 
+CREDS = Credentials.from_service_account_file('creds.json')
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 MACHINES_SHEET = GSPREAD_CLIENT.open('VendingMachine')
 SALES_SHEET = GSPREAD_CLIENT.open('VendingSales')
 ALARM_SHEET = GSPREAD_CLIENT.open('Alarms')
-MACHINES_SHEET_ID = '1WgqyZJv61UsML8GGC8QygVm5rDc_4K5IeFve66Sfjp8' 
+MACHINES_SHEET_ID = '1WgqyZJv61UsML8GGC8QygVm5rDc_4K5IeFve66Sfjp8'
 SALES_SHEET_ID = '1FbPbWOSGx6rh_AAkMYSMEWlBVr_n5EkIGA-fEFsz5J8'
 ALARM_SHEET_ID = '1JJfoOBQzP3t4PFv2pj6MkkTAolq6V9nA3o1Q2dzmgvU'
 SHEETS_API_NAME = 'sheets'
@@ -33,7 +31,7 @@ PRICE_TWIX = 2
 PRICE_BOUNTY = 4
 
 
-# VM_Logic class ------------------------------------------------------------------------
+# VM_Logic class ---------------------------------------------------------
 class VM_Logic:
     def __init__(self):
         self.address = ""
@@ -48,11 +46,12 @@ class VM_Logic:
 
     def get_vm_list(self):
         """
-        Return a list of the avaliable worksheets in VendingMachine workshhet (VM01) 
+        Return a list of the avaliable worksheets
+        in VendingMachine workshhet (VM01)
         """
         sheets_names = []
         for spreadsheet in MACHINES_SHEET:
-            sheets_names.append(spreadsheet.title) 
+            sheets_names.append(spreadsheet.title)
         v_machines_list = sheets_names[1:]
         v_machines_list.sort()
         return v_machines_list
@@ -65,10 +64,11 @@ class VM_Logic:
         date = date_time.strftime("%Y-%m-%d")
         time = date_time.strftime("%H:%M")
         return [date, time]
-    
+
     def update_vm(self, operation):
         """
-        Update the values in the work sheet with the data from the machine object
+        Update the values in the work sheet
+        with the data from the machine object
         Has four options:
         initialize
         cashing
@@ -76,9 +76,18 @@ class VM_Logic:
         sell
         """
         def upload_data():
-            current_row = [date_time[0], date_time[1], operation, self.mars, self.snickers, self.twix, self.bounty, self.cash]
+            current_row = [
+                date_time[0],
+                date_time[1],
+                operation,
+                self.mars,
+                self.snickers,
+                self.twix,
+                self.bounty,
+                self.cash
+                ]
             current_vm = MACHINES_SHEET.worksheet(self.name)
-            current_vm.append_row(current_row) 
+            current_vm.append_row(current_row)
         date_time = self.get_date_time()
         if operation == 'initialize':
             self.mars = self.snickers = self.twix = self.bounty = MAX_STOCK
@@ -100,8 +109,8 @@ class VM_Logic:
         """
         current_vm = ALARM_SHEET.worksheet(self.name)
         data = current_vm.get_all_values()
-        current_vm.delete_rows(4, len(data))    
-        
+        current_vm.delete_rows(4, len(data))
+
     def count_sales(self, vm):
         """
         Counts quantity of sold items
@@ -115,17 +124,39 @@ class VM_Logic:
             if data[i][0] != current_date_time[0] or i == 0:
                 data_slice = data[i:]
                 count = [0, 0, 0, 0]
-                prev_quantity = [data[i][3], data[i][4], data[i][5], data[i][6]]
+                prev_quantity = [
+                    data[i][3],
+                    data[i][4],
+                    data[i][5],
+                    data[i][6]
+                    ]
                 temp_quantity = []
                 for i in range(len(data_slice)):
                     if data_slice[i][2] == 'topup':
-                        temp_quantity = [data_slice[i-1][3], data_slice[i-1][4], data_slice[i-1][5], data_slice[i-1][6]]                        
+                        temp_quantity = [
+                            data_slice[i-1][3],
+                            data_slice[i-1][4],
+                            data_slice[i-1][5],
+                            data_slice[i-1][6]
+                            ]
                         for x in range(4):
-                            count[x] += int(prev_quantity[x]) - int(temp_quantity[x])
-                        prev_quantity = [MAX_STOCK, MAX_STOCK, MAX_STOCK, MAX_STOCK]
-                    temp_quantity = [data_slice[i][3], data_slice[i][4], data_slice[i][5], data_slice[i][6]]    
+                            count[x] += (int(prev_quantity[x])
+                                         - int(temp_quantity[x]))
+                        prev_quantity = [
+                            MAX_STOCK,
+                            MAX_STOCK,
+                            MAX_STOCK,
+                            MAX_STOCK
+                            ]
+                    temp_quantity = [
+                        data_slice[i][3],
+                        data_slice[i][4],
+                        data_slice[i][5],
+                        data_slice[i][6]
+                        ]
                 for i in range(4):
-                    count[i] += int(prev_quantity[i]) - int(temp_quantity[i])
+                    count[i] += (int(prev_quantity[i])
+                                 - int(temp_quantity[i]))
                 return count
 
     def update_sales(self):
@@ -142,9 +173,16 @@ class VM_Logic:
         date_time = self.get_date_time()
         sales = self.count_sales(self.name)
         revenue = calculate_revenue()
-        current_row = [date_time[0], sales[0], sales[1], sales[2], sales[3], revenue]
+        current_row = [
+            date_time[0],
+            sales[0],
+            sales[1],
+            sales[2],
+            sales[3],
+            revenue
+            ]
         current_vm = SALES_SHEET.worksheet(self.name)
-        current_vm.append_row(current_row)      
+        current_vm.append_row(current_row)
 
     def get_data(self, vm):
         """
@@ -160,7 +198,7 @@ class VM_Logic:
         self.twix = int(last_data[5])
         self.bounty = int(last_data[6])
         self.cash = float(last_data[7])
-        
+
     def check_stock(self):
         """
         Check the remaining stock and return a list of row alarms
@@ -185,7 +223,11 @@ class VM_Logic:
             alarms.append(f'Twix {stock_empty}')
         if self.bounty == 0:
             alarms.append(f'Bounty {stock_empty}')
-        alarm_rows = [[current_date_time[0], current_date_time[1], item, self.address] for item in alarms]
+        alarm_rows = [[
+            current_date_time[0],
+            current_date_time[1],
+            item, self.address
+            ] for item in alarms]
         return alarm_rows
 
     def update_alarms(self):
@@ -195,7 +237,7 @@ class VM_Logic:
         current_vm = ALARM_SHEET.worksheet(self.name)
         rows = self.check_stock()
         for row in rows:
-            current_vm.append_row(row)      
+            current_vm.append_row(row)
 
     def create_vm(self, address):
         """
@@ -204,13 +246,25 @@ class VM_Logic:
         name_index = self.name_avaliable_check()
         self.address = address
         self.name = name_index[0]
-        MACHINES_SHEET.duplicate_sheet(0, new_sheet_name=f'{name_index[0]}', insert_sheet_index=name_index[1])
+        MACHINES_SHEET.duplicate_sheet(
+            0,
+            new_sheet_name=f'{name_index[0]}',
+            insert_sheet_index=name_index[1]
+            )
         machines = MACHINES_SHEET.worksheet(name_index[0])
         machines.update_acell('B1', address)
-        SALES_SHEET.duplicate_sheet(0, new_sheet_name=f'{name_index[0]}', insert_sheet_index=name_index[1])
+        SALES_SHEET.duplicate_sheet(
+            0,
+            new_sheet_name=f'{name_index[0]}',
+            insert_sheet_index=name_index[1]
+            )
         sales = SALES_SHEET.worksheet(name_index[0])
         sales.update_acell('B1', address)
-        ALARM_SHEET.duplicate_sheet(0, new_sheet_name=f'{name_index[0]}', insert_sheet_index=name_index[1])
+        ALARM_SHEET.duplicate_sheet(
+            0,
+            new_sheet_name=f'{name_index[0]}',
+            insert_sheet_index=name_index[1]
+            )
         alarms = ALARM_SHEET.worksheet(name_index[0])
         alarms.update_acell('B1', address)
         self.update_vm('initialize')
@@ -226,7 +280,7 @@ class VM_Logic:
         SALES_SHEET.del_worksheet(worksheet_to_del)
         worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
         SALES_SHEET.del_worksheet(worksheet_to_del)
-    
+
     def name_avaliable_check(self):
         """
         Check the avaliablity of machine names
@@ -237,10 +291,10 @@ class VM_Logic:
             current_name = f'vm{"0" + str(i) if i < 10 else i}'
             if current_name not in vm_list:
                 return [current_name, i]
-            i += 1 
+            i += 1
 
 
-# Admin class ---------------------------------------------------------------------------
+# Admin class ------------------------------------------------------------
 class Admin():
     def __init__(self, ui, vm_logic):
         self.ui = ui
@@ -253,8 +307,8 @@ class Admin():
         option = self.ui.admin_menu()
         if option == "1":
             address = self.ui.address()
-            self.vm_logic.create_vm(address) 
-            self.ui.feed_back('add')   
+            self.vm_logic.create_vm(address)
+            self.ui.feed_back('add')
         else:
             avaliable_machines = self.vm_logic.get_vm_list()
             vm_name = self.ui.select_machine(avaliable_machines)
@@ -262,7 +316,7 @@ class Admin():
             self.ui.feed_back('')
 
 
-# VendingMachine class ------------------------------------------------------------------
+# VendingMachine class ---------------------------------------------------
 class VendingMachine():
     def __init__(self, ui, vm_logic):
         self.ui = ui
@@ -273,7 +327,7 @@ class VendingMachine():
         The logic behind buying items
         """
         current_vm = self.ui.select_machine(self.vm_logic.get_vm_list())
-        if current_vm != False:
+        if current_vm is not False:
             self.vm_logic.get_data(current_vm)
             vm_option = self.ui.machine_menu()
             if vm_option == '5':
@@ -314,10 +368,10 @@ class VendingMachine():
                     self.vm_logic.update_alarms()
                 self.ui.outro(state)
 
-    def maintain(self, option): 
+    def maintain(self, option):
         """
         The actions taken when choosing the admin options of vending machine
-        """               
+        """
         if option == '1':
             self.vm_logic.update_vm('topup')
         if option == '2':
@@ -325,11 +379,11 @@ class VendingMachine():
         self.ui.outro('maintain')
 
 
-# VM_UI ---------------------------------------------------------------------------------
+# VM_UI ------------------------------------------------------------------
 class VM_UI():
     def __init__(self):
         self.name = ''
-    
+
     def clear(self):
         """
         Clear the terminal
@@ -337,7 +391,7 @@ class VM_UI():
         if name == 'nt':
             _ = system('cls')
         else:
-            _ = system('clear') 
+            _ = system('clear')
 
     def intro(self):
         """
@@ -345,20 +399,26 @@ class VM_UI():
         """
         self.clear()
         print('Welcome to VenderApp.')
-        print('VenderApp as an application that imitates the work of several vending machines connected to a database.')
-        print('The user can create vending machines, service them, check stock and sales informations, and get alarms')
+        print(
+            'VenderApp as an application that imitates the work ' +
+            'of several vending machines connected to a database.'
+             )
+        print(
+            'The user can create vending machines, service them, ' +
+            'check stock and sales informations, and get alarms'
+             )
         user_input = ' '
         while user_input != '':
             user_input = input('To start hit Enter\n')
-        
+
     def outro(self, op_type):
         """
         Show outro when the interaction is finished
         """
         self.clear()
         if op_type == "buy":
-            print('Thank You, for your purchase.')        
-            print('Have a nice day')   
+            print('Thank You, for your purchase.')
+            print('Have a nice day')
             sleep(3)
         if op_type == "maintain":
             print('Maintenence finished')
@@ -391,8 +451,8 @@ class VM_UI():
         if len(avaliable_machines) != 0:
             print('Select a vending machine')
             print('Just type the machine name (example vm01)')
-            print('These are the machines avaliable at the moment:') 
-            print(avaliable_machines) 
+            print('These are the machines avaliable at the moment:')
+            print(avaliable_machines)
             while (True):
                 user_input = input('\nEnter machine name:\n')
                 for name in avaliable_machines:
@@ -401,7 +461,10 @@ class VM_UI():
                         return user_input
                 print('Please, choose a name from the list.')
         else:
-            print('There are no machines found.\nYou can create new machines as an Admin')
+            print(
+                'There are no machines found.\nYou can' +
+                ' create new machines as an Admin'
+                )
             sleep(3)
             return False
 
@@ -410,7 +473,7 @@ class VM_UI():
         Show the options of the current machine to choose from
         """
         self.clear()
-        print(f'Vending machine {self.name}\n') 
+        print(f'Vending machine {self.name}\n')
         print('Select a product:\n')
         print(f'1- Mars -------- {PRICE_MARS}$')
         print(f'2- Snickers ---- {PRICE_SNICKERS}$')
@@ -419,7 +482,7 @@ class VM_UI():
         print('5- Maintenance\n')
         while (True):
             user_input = input('Enter 1 - 5\n')
-            for i in range(1, 6): 
+            for i in range(1, 6):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose from the menu.')
@@ -434,7 +497,7 @@ class VM_UI():
         print(f'2- Cashing\n')
         while (True):
             user_input = input('Enter 1 or 2\n')
-            for i in range(1, 3): 
+            for i in range(1, 3):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose from the menu.')
@@ -456,11 +519,11 @@ class VM_UI():
 
     def address(self):
         """
-        Ask the user for adress input 
+        Ask the user for adress input
         """
         self.clear()
         while (True):
-            user_input = input ('Enter an adress.\n')
+            user_input = input('Enter an adress.\n')
             if user_input.strip() != '':
                 return user_input
         print('Enter valid address, please.')
