@@ -243,43 +243,84 @@ class VM_Logic:
         """
         Create new sheets in the machines, sales and alarm sheets
         """
+        def responce(e, sheet_name):
+            print(f'An error occurred in the {sheet_name} spread sheet:\n{e}')
+            sleep(5)
+            return(f'\n With error in the {sheet_name} spread sheet:\n{str(e)}')
+
         name_index = self.name_avaliable_check()
         self.address = address
         self.name = name_index[0]
-        MACHINES_SHEET.duplicate_sheet(
-            0,
-            new_sheet_name=f'{name_index[0]}',
-            insert_sheet_index=name_index[1]
-            )
-        machines = MACHINES_SHEET.worksheet(name_index[0])
-        machines.update_acell('B1', address)
-        SALES_SHEET.duplicate_sheet(
-            0,
-            new_sheet_name=f'{name_index[0]}',
-            insert_sheet_index=name_index[1]
-            )
-        sales = SALES_SHEET.worksheet(name_index[0])
-        sales.update_acell('B1', address)
-        ALARM_SHEET.duplicate_sheet(
-            0,
-            new_sheet_name=f'{name_index[0]}',
-            insert_sheet_index=name_index[1]
-            )
-        alarms = ALARM_SHEET.worksheet(name_index[0])
-        alarms.update_acell('B1', address)
+        try:
+            MACHINES_SHEET.duplicate_sheet(
+                0,
+                new_sheet_name=f'{name_index[0]}',
+                insert_sheet_index=name_index[1]
+                )
+            machines = MACHINES_SHEET.worksheet(name_index[0])
+            machines.update_acell('B1', address)
+        except gspread.exceptions.APIError as e:
+            return (responce(e, 'VendingMachine'))
+        try:
+            SALES_SHEET.duplicate_sheet(
+                0,
+                new_sheet_name=f'{name_index[0]}',
+                insert_sheet_index=name_index[1]
+                )
+            sales = SALES_SHEET.worksheet(name_index[0])
+            sales.update_acell('B1', address)
+        except gspread.exceptions.APIError as e:
+            return (responce(e, 'VendingSales'))
+        try:
+            ALARM_SHEET.duplicate_sheet(
+                0,
+                new_sheet_name=f'{name_index[0]}',
+                insert_sheet_index=name_index[1]
+                )
+            alarms = ALARM_SHEET.worksheet(name_index[0])
+            alarms.update_acell('B1', address)
+        except gspread.exceptions.APIError as e:
+            return (responce(e, 'Alarm'))
         self.update_vm('initialize')
         self.get_data(name_index[0])
+        
+        return ('')
 
     def delete_vm(self, name):
         """
         Delete sheets in the machines, sales and alarm sheets
         """
-        worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
-        MACHINES_SHEET.del_worksheet(worksheet_to_del)
-        worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
-        SALES_SHEET.del_worksheet(worksheet_to_del)
-        worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
-        ALARM_SHEET.del_worksheet(worksheet_to_del)
+        try:
+            worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
+            MACHINES_SHEET.del_worksheet(worksheet_to_del)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the VendingMachine spread sheet.')
+            sleep(5) 
+            return (f'\n With error: worksheet {e}' +
+                    ' in the VendingMachine spread sheet not found.')
+        try:       
+            worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
+            SALES_SHEET.del_worksheet(worksheet_to_del)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the VendingSales spread sheet.')
+            sleep(5)
+            return (f'\n With error: worksheet {e}' +
+                    ' in the VendingSales spread sheet not found.')
+        try:    
+            worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
+            ALARM_SHEET.del_worksheet(worksheet_to_del)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the Alarms spread sheet.')
+            sleep(5)
+            return (f'\n With error: worksheet {e}' +
+                    ' in the Alarms spread sheet not found.')
+        return ('')
 
     def name_avaliable_check(self):
         """
@@ -307,13 +348,13 @@ class Admin():
         option = self.ui.admin_menu()
         if option == "1":
             address = self.ui.address()
-            self.vm_logic.create_vm(address)
-            self.ui.feed_back('add')
+            exception = self.vm_logic.create_vm(address)
+            self.ui.feed_back('add', exception)
         else:
             avaliable_machines = self.vm_logic.get_vm_list()
             vm_name = self.ui.select_machine(avaliable_machines)
-            self.vm_logic.delete_vm(vm_name)
-            self.ui.feed_back('')
+            exception = self.vm_logic.delete_vm(vm_name)
+            self.ui.feed_back('', exception)
 
 
 # VendingMachine class ---------------------------------------------------
@@ -528,17 +569,17 @@ class VM_UI():
                 return user_input
         print('Enter valid address, please.')
 
-    def feed_back(self, option):
+    def feed_back(self, option, exception):
         """
         Give feedback when the operation is finished
         """
         self.clear()
         if option == 'add':
-            print('Vending machine added successfully.')
-            sleep(3)
+            print('Vending machine added successfully.' + exception)
+            sleep(5)
         else:
-            print('Vending machine deleted successfully.')
-            sleep(3)
+            print('Vending machine deleted successfully.' + exception)
+            sleep(5)
 
 
 def main():
