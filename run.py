@@ -107,9 +107,15 @@ class VM_Logic:
         """
         Delete the entries from the alarm sheet
         """
-        current_vm = ALARM_SHEET.worksheet(self.name)
-        data = current_vm.get_all_values()
-        current_vm.delete_rows(4, len(data))
+        try:
+            current_vm = ALARM_SHEET.worksheet(self.name)
+            data = current_vm.get_all_values()
+            current_vm.delete_rows(4, len(data))
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the Alarms spread sheet.')
+            sleep(5)
 
     def count_sales(self, vm):
         """
@@ -181,23 +187,35 @@ class VM_Logic:
             sales[3],
             revenue
             ]
-        current_vm = SALES_SHEET.worksheet(self.name)
-        current_vm.append_row(current_row)
+        try:
+            current_vm = SALES_SHEET.worksheet(self.name)
+            current_vm.append_row(current_row)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the VendingSales spread sheet.')
+            sleep(5)
 
     def get_data(self, vm):
         """
         Get data from the work sheet and write the values to the machine object
         """
-        v_machine = MACHINES_SHEET.worksheet(vm)
-        data = v_machine.get_all_values()
-        last_data = data[-1]
-        self.address = data[0][1]
-        self.name = vm
-        self.mars = int(last_data[3])
-        self.snickers = int(last_data[4])
-        self.twix = int(last_data[5])
-        self.bounty = int(last_data[6])
-        self.cash = float(last_data[7])
+        try:
+            v_machine = MACHINES_SHEET.worksheet(vm)
+            data = v_machine.get_all_values()
+            last_data = data[-1]
+            self.address = data[0][1]
+            self.name = vm
+            self.mars = int(last_data[3])
+            self.snickers = int(last_data[4])
+            self.twix = int(last_data[5])
+            self.bounty = int(last_data[6])
+            self.cash = float(last_data[7])
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the VendingMachine spread sheet.')
+            sleep(5)
 
     def check_stock(self):
         """
@@ -234,10 +252,16 @@ class VM_Logic:
         """
         Update the alarm sheet from the alarm rows list
         """
-        current_vm = ALARM_SHEET.worksheet(self.name)
-        rows = self.check_stock()
-        for row in rows:
-            current_vm.append_row(row)
+        try:
+            current_vm = ALARM_SHEET.worksheet(self.name)
+            rows = self.check_stock()
+            for row in rows:
+                current_vm.append_row(row)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(f'Please verify that the worksheet {e}' +
+                    ' exists in the Alarms spread sheet.')
+            sleep(5)
 
     def create_vm(self, address):
         """
@@ -298,7 +322,7 @@ class VM_Logic:
             print(f'Please verify that the worksheet {e}' +
                     ' exists in the VendingMachine spread sheet.')
             sleep(5) 
-            return (f'\n With error: worksheet {e}' +
+            return (f'\nWith error: worksheet {e}' +
                     ' in the VendingMachine spread sheet not found.')
         try:       
             worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
@@ -308,7 +332,7 @@ class VM_Logic:
             print(f'Please verify that the worksheet {e}' +
                     ' exists in the VendingSales spread sheet.')
             sleep(5)
-            return (f'\n With error: worksheet {e}' +
+            return (f'\nWith error: worksheet {e}' +
                     ' in the VendingSales spread sheet not found.')
         try:    
             worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
@@ -318,7 +342,7 @@ class VM_Logic:
             print(f'Please verify that the worksheet {e}' +
                     ' exists in the Alarms spread sheet.')
             sleep(5)
-            return (f'\n With error: worksheet {e}' +
+            return (f'\nWith error: worksheet {e}' +
                     ' in the Alarms spread sheet not found.')
         return ('')
 
@@ -564,7 +588,7 @@ class VM_UI():
         """
         self.clear()
         while (True):
-            user_input = input('Enter an adress.\n')
+            user_input = input('Enter an address.\n')
             if user_input.strip() != '':
                 return user_input
         print('Enter valid address, please.')
