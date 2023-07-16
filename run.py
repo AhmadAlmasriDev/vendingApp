@@ -110,11 +110,13 @@ class VM_Logic:
         try:
             current_vm = ALARM_SHEET.worksheet(self.name)
             data = current_vm.get_all_values()
-            current_vm.delete_rows(4, len(data))
+            if len(data) > 3:
+                current_vm.delete_rows(4, len(data))
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the Alarms spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the Alarms spread sheet.')
             sleep(5)
 
     def count_sales(self, vm):
@@ -192,8 +194,9 @@ class VM_Logic:
             current_vm.append_row(current_row)
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the VendingSales spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the VendingSales spread sheet.')
             sleep(5)
 
     def get_data(self, vm):
@@ -213,8 +216,9 @@ class VM_Logic:
             self.cash = float(last_data[7])
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the VendingMachine spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the VendingMachine spread sheet.')
             sleep(5)
 
     def check_stock(self):
@@ -259,8 +263,9 @@ class VM_Logic:
                 current_vm.append_row(row)
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the Alarms spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the Alarms spread sheet.')
             sleep(5)
 
     def create_vm(self, address):
@@ -270,8 +275,9 @@ class VM_Logic:
         def responce(e, sheet_name):
             print(f'An error occurred in the {sheet_name} spread sheet:\n{e}')
             sleep(5)
-            return(f'\n With error in the {sheet_name} spread sheet:\n{str(e)}')
-
+            return (
+                f'\n With error in the {sheet_name}' +
+                ' spread sheet:\n{str(e)}')
         name_index = self.name_avaliable_check()
         self.address = address
         self.name = name_index[0]
@@ -307,7 +313,6 @@ class VM_Logic:
             return (responce(e, 'Alarm'))
         self.update_vm('initialize')
         self.get_data(name_index[0])
-        
         return ('')
 
     def delete_vm(self, name):
@@ -319,28 +324,31 @@ class VM_Logic:
             MACHINES_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the VendingMachine spread sheet.')
-            sleep(5) 
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the VendingMachine spread sheet.')
+            sleep(5)
             return (f'\nWith error: worksheet {e}' +
                     ' in the VendingMachine spread sheet not found.')
-        try:       
+        try:
             worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
             SALES_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the VendingSales spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the VendingSales spread sheet.')
             sleep(5)
             return (f'\nWith error: worksheet {e}' +
                     ' in the VendingSales spread sheet not found.')
-        try:    
+        try:
             worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
             ALARM_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
             print('Trying to open non-existent sheet.')
-            print(f'Please verify that the worksheet {e}' +
-                    ' exists in the Alarms spread sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the Alarms spread sheet.')
             sleep(5)
             return (f'\nWith error: worksheet {e}' +
                     ' in the Alarms spread sheet not found.')
