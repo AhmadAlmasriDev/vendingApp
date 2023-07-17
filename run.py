@@ -172,6 +172,9 @@ class VM_Logic:
         Updates the sales sheet with the calculated values
         """
         def calculate_revenue():
+            """
+            Calulate the revenue according to the prices in constants
+            """
             price = [PRICE_MARS, PRICE_SNICKERS, PRICE_TWIX, PRICE_BOUNTY]
             revenue = 0
             for item, price in zip(sales, price):
@@ -273,6 +276,9 @@ class VM_Logic:
         Create new sheets in the machines, sales and alarm sheets
         """
         def responce(e, sheet_name):
+            """
+            Form the responce to return depending on the spread sheet error
+            """
             print(f'An error occurred in the {sheet_name} spread sheet:\n{e}')
             sleep(5)
             return (
@@ -472,14 +478,11 @@ class VM_UI():
         """
         self.clear()
         print('Welcome to VenderApp.')
-        print(
-            'VenderApp is an application that imitates the work ' +
-            'of several vending machines connected to a database.'
-             )
-        print(
-            'The user can create vending machines, service them, ' +
-            'check stock and sales information, and get alarms'
-             )
+        print('VenderApp is an application that imitates the work')
+        print('of several vending machines connected to a database.')
+        print('The user can create and service vending machines,')
+        print('check stock and sales information,')
+        print('and receive alarms')
         user_input = ' '
         while user_input != '':
             user_input = input('To start hit Enter\n')
