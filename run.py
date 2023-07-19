@@ -525,7 +525,7 @@ class VM_UI():
         Show the option of what role the user wants
         """
         self.clear()
-        print('Choose an option:\n')
+        print('select an option:\n')
         print('1- Vending machine')
         print('2- Admin\n')
         while (True):
@@ -566,7 +566,7 @@ class VM_UI():
         """
         self.clear()
         print(f'Vending machine {self.name}\n')
-        print('Select a product:\n')
+        print('select an option:\n')
         print(f'1- Mars -------- {PRICE_MARS}$')
         print(f'2- Snickers ---- {PRICE_SNICKERS}$')
         print(f'3- Twix -------- {PRICE_TWIX}$')
@@ -585,7 +585,7 @@ class VM_UI():
         Show the maintenence menu to choose from
         """
         self.clear()
-        print('Select:\n')
+        print('select an option:\n')
         print('1- Topup')
         print('2- Cashing\n')
         print('3- Exit')
@@ -601,15 +601,16 @@ class VM_UI():
         Show the admin menu to shoose from
         """
         self.clear()
-        print('Choose an option:\n')
+        print('select an option:\n')
         print('1- Create new vending machine')
-        print('2- Delete a vending machine\n')
+        print('2- Delete a vending machine')
+        print('3- Exit\n')
         while (True):
-            user_input = input('Enter 1 or 2\n')
-            for i in range(1, 3):
+            user_input = input('Enter 1 or 3\n')
+            for i in range(1, 4):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose from the menu.')
+            print('Please, choose an option from the menu.')
 
     def address(self):
         """
