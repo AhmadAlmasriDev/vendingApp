@@ -453,10 +453,11 @@ class VendingMachine():
         """
         if option == '1':
             self.vm_logic.update_vm('topup')
+            self.ui.outro('maintain topup')
         if option == '2':
             self.vm_logic.update_vm('cashing')
-        self.ui.outro('maintain')
-
+            self.ui.outro('maintain cash')
+        
 
 # VM_UI ------------------------------------------------------------------
 class VM_UI():
@@ -496,8 +497,14 @@ class VM_UI():
             print('Thank You, for your purchase.')
             print('Have a nice day')
             sleep(3)
-        if op_type == "maintain":
+        if op_type == "maintain topup":
             print('Maintenence finished')
+            print('Vending Machine topped-up')
+            print('Back to main menu')
+            sleep(3)
+        if op_type == "maintain cash":
+            print('Maintenence finished')
+            print('Vending Machine Cashed')
             print('Back to main menu')
             sleep(3)
         if op_type == "out":
