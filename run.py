@@ -119,60 +119,60 @@ class VM_Logic:
                 ' exists in the Alarms spread sheet.')
             sleep(5)
 
+    # def count_sales(self, vm):
+    #     """
+    #     Counts quantity of sold items
+    #     """
+    #     current_date_time = self.get_date_time()
+    #     raw_info = MACHINES_SHEET.worksheet(vm)
+    #     data = raw_info.get_all_values()[3:]
+    #     for i in reversed(range(len(data))):
+    #         prev_quantity = []
+    #         data_slice = []
+    #         if data[i][0] != current_date_time[0] or i == 0:
+    #             data_slice = data[i:]
+    #             count = [0, 0, 0, 0]
+    #             prev_quantity = [
+    #                 data[i][3],
+    #                 data[i][4],
+    #                 data[i][5],
+    #                 data[i][6]
+    #                 ]
+    #             temp_quantity = []
+    #             for i in range(len(data_slice)):
+    #                 if data_slice[i][2] == 'topup':
+    #                     temp_quantity = [
+    #                         data_slice[i-1][3],
+    #                         data_slice[i-1][4],
+    #                         data_slice[i-1][5],
+    #                         data_slice[i-1][6]
+    #                         ]
+    #                     for x in range(4):
+    #                         count[x] += (int(prev_quantity[x])
+    #                                      - int(temp_quantity[x]))
+    #                     prev_quantity = [
+    #                         MAX_STOCK,
+    #                         MAX_STOCK,
+    #                         MAX_STOCK,
+    #                         MAX_STOCK
+    #                         ]
+    #                 temp_quantity = [
+    #                     data_slice[i][3],
+    #                     data_slice[i][4],
+    #                     data_slice[i][5],
+    #                     data_slice[i][6]
+    #                     ]
+    #             for i in range(4):
+    #                 count[i] += (int(prev_quantity[i])
+    #                              - int(temp_quantity[i]))
+    #             return count
+
     def count_sales(self, vm):
-        """
-        Counts quantity of sold items
-        """
-        current_date_time = self.get_date_time()
-        raw_info = MACHINES_SHEET.worksheet(vm)
-        data = raw_info.get_all_values()[3:]
-        for i in reversed(range(len(data))):
-            prev_quantity = []
-            data_slice = []
-            if data[i][0] != current_date_time[0] or i == 0:
-                data_slice = data[i:]
-                count = [0, 0, 0, 0]
-                prev_quantity = [
-                    data[i][3],
-                    data[i][4],
-                    data[i][5],
-                    data[i][6]
-                    ]
-                temp_quantity = []
-                for i in range(len(data_slice)):
-                    if data_slice[i][2] == 'topup':
-                        temp_quantity = [
-                            data_slice[i-1][3],
-                            data_slice[i-1][4],
-                            data_slice[i-1][5],
-                            data_slice[i-1][6]
-                            ]
-                        for x in range(4):
-                            count[x] += (int(prev_quantity[x])
-                                         - int(temp_quantity[x]))
-                        prev_quantity = [
-                            MAX_STOCK,
-                            MAX_STOCK,
-                            MAX_STOCK,
-                            MAX_STOCK
-                            ]
-                    temp_quantity = [
-                        data_slice[i][3],
-                        data_slice[i][4],
-                        data_slice[i][5],
-                        data_slice[i][6]
-                        ]
-                for i in range(4):
-                    count[i] += (int(prev_quantity[i])
-                                 - int(temp_quantity[i]))
-                return count
-                
-    def count_sales2(self, vm):
         raw_info = MACHINES_SHEET.worksheet(vm)
         data = raw_info.get_all_values()[-1] 
-        return [[item] for index, item in enumerate(data) if index in range(1, 5)]
+        return [[int(item)] for index, item in enumerate(data) if index in range(1, 5)]
 
-    def update_sales(self):
+    def update_sales(self, index):
         """
         Updates the sales sheet with the calculated values
         """
@@ -188,6 +188,7 @@ class VM_Logic:
 
         date_time = self.get_date_time()
         sales = self.count_sales(self.name)
+        sales[index] += 1 
         revenue = calculate_revenue()
         current_row = [
             date_time[0],
@@ -206,6 +207,41 @@ class VM_Logic:
                 f'Please verify that the worksheet {e}' +
                 ' exists in the VendingSales spread sheet.')
             sleep(5)
+
+    # def update_sales(self):
+    #     """
+    #     Updates the sales sheet with the calculated values
+    #     """
+    #     def calculate_revenue():
+    #         """
+    #         Calulate the revenue according to the prices in constants
+    #         """
+    #         price = [PRICE_MARS, PRICE_SNICKERS, PRICE_TWIX, PRICE_BOUNTY]
+    #         revenue = 0
+    #         for item, price in zip(sales, price):
+    #             revenue += item * price
+    #         return revenue
+
+    #     date_time = self.get_date_time()
+    #     sales = self.count_sales(self.name)
+    #     revenue = calculate_revenue()
+    #     current_row = [
+    #         date_time[0],
+    #         sales[0],
+    #         sales[1],
+    #         sales[2],
+    #         sales[3],
+    #         revenue
+    #         ]
+    #     try:
+    #         current_vm = SALES_SHEET.worksheet(self.name)
+    #         current_vm.append_row(current_row)
+    #     except gspread.exceptions.WorksheetNotFound as e:
+    #         print('Trying to open non-existent sheet.')
+    #         print(
+    #             f'Please verify that the worksheet {e}' +
+    #             ' exists in the VendingSales spread sheet.')
+    #         sleep(5)
 
     def get_data(self, vm):
         """
@@ -454,6 +490,7 @@ class VendingMachine():
                     if self.vm_logic.mars != 0:
                         self.vm_logic.mars -= 1
                         self.vm_logic.cash += PRICE_MARS
+                        self.vm_logic.update_sales(0)
                         state = 'buy'
                     else:
                         state = 'out'
@@ -461,6 +498,7 @@ class VendingMachine():
                     if self.vm_logic.snickers != 0:
                         self.vm_logic.snickers -= 1
                         self.vm_logic.cash += PRICE_SNICKERS
+                        self.vm_logic.update_sales(1)
                         state = 'buy'
                     else:
                         state = 'out'
@@ -468,6 +506,7 @@ class VendingMachine():
                     if self.vm_logic.twix != 0:
                         self.vm_logic.twix -= 1
                         self.vm_logic.cash += PRICE_TWIX
+                        self.vm_logic.update_sales(2)
                         state = 'buy'
                     else:
                         state = 'out'
@@ -475,6 +514,7 @@ class VendingMachine():
                     if self.vm_logic.bounty != 0:
                         self.vm_logic.bounty -= 1
                         self.vm_logic.cash += PRICE_BOUNTY
+                        self.vm_logic.update_sales(3)
                         state = 'buy'
                     else:
                         state = 'out'
@@ -482,7 +522,7 @@ class VendingMachine():
                     state = 'exit'
                 if state == 'buy':
                     self.vm_logic.update_vm('sell')
-                    self.vm_logic.update_sales()
+                    # self.vm_logic.update_sales()
                     self.vm_logic.update_alarms()
                     # ---------------------------
                 self.ui.outro(state)
