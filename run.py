@@ -66,6 +66,9 @@ class VM_Logic:
         return [date, time]
 
     def init_sales(self, date):
+        """
+        Initiate the sales work sheet for a vm
+        """
         init_num = 0
         current_row = [
             date,
@@ -92,6 +95,9 @@ class VM_Logic:
         sell
         """
         def upload_data():
+            """
+            Upload data to the machine work sheet
+            """
             current_row = [
                 date_time[0],
                 date_time[1],
@@ -196,8 +202,12 @@ class VM_Logic:
             for item, price in zip(sales, price):
                 revenue += item * price
             return revenue
-        
         sales = self.count_sales_in_date(vm, date)
+        if sales == [0, 0, 0, 0]:
+            return {
+                'No data available': 'There is no data available for ' +
+                'this date, or the date is incorrect'
+            }
         revenue = calculate_revenue()
         current_data = {
             'date': date,
@@ -210,9 +220,15 @@ class VM_Logic:
         return current_data
 
     def count_sales(self, vm):
+        """
+        Count the sales for a vm
+        """
         raw_info = SALES_SHEET.worksheet(vm)
-        data = raw_info.get_all_values()[-1] 
-        return [int(item) for index, item in enumerate(data) if index in range(1, 5)]
+        data = raw_info.get_all_values()[-1]
+        return [
+            int(item) for index, item
+            in enumerate(data)
+            if index in range(1, 5)]
 
     def update_sales(self, index):
         """
@@ -264,6 +280,27 @@ class VM_Logic:
         except gspread.exceptions.WorksheetNotFound as e:
             self.ui.output_error(e)
 
+    def get_alarms(self, vm):
+        """
+        Return a dictionary of the vm alarms if available
+        """
+        try:
+            current_vm = ALARM_SHEET.worksheet(vm)
+            data = current_vm.get_all_values()
+            if len(data) > 3:
+                all_data = data[3:]
+                alarms = {
+                    f'Alarm{index + 1}':
+                    f'{item[0]}    {item[2]}   {item[3]}'
+                    for index, item in enumerate(all_data)}
+                return alarms
+            else:
+                return {
+                    'No Alarms': 'Currently there are no allarms for this vm'
+                    }
+        except gspread.exceptions.WorksheetNotFound as e:
+            self.ui.output_error(e)
+
     def check_stock(self):
         """
         Check the remaining stock and return a list of row alarms
@@ -308,7 +345,9 @@ class VM_Logic:
             self.ui.output_error(e)
 
     def get_vm_stock_info(self, vm):
-
+        """
+        Get the vm current stock and information
+        """
         try:
             data = MACHINES_SHEET.worksheet(vm)
             vm_data = data.get_all_values()
@@ -446,9 +485,14 @@ class Admin():
         elif option == "4":
             avaliable_machines = self.vm_logic.get_vm_list()
             vm_name = self.ui.select_machine(avaliable_machines)
-            latest_data = self.vm_logic.calculate_sales_in_date(vm_name, '2023-07-19')
+            date = self.ui.date_input()
+            latest_data = self.vm_logic.calculate_sales_in_date(vm_name, date)
             self.ui.output_result(latest_data)
-            
+        elif option == "5":
+            avaliable_machines = self.vm_logic.get_vm_list()
+            vm_name = self.ui.select_machine(avaliable_machines)
+            latest_data = self.vm_logic.get_alarms(vm_name)
+            self.ui.output_result(latest_data)
         else:
             self.ui.outro('exit')
 
@@ -545,11 +589,12 @@ class VM_UI():
         Print result dictionary via terminal
         """
         self.clear()
-        for key, item in res.items():
-            print(f'{key} : {item}')
-        user_input = ' '
-        while user_input != '':
-            user_input = input('\nTo continue hit Enter\n')
+        if (res):
+            for key, item in res.items():
+                print(f'{key} : {item}')
+            user_input = ' '
+            while user_input != '':
+                user_input = input('\nTo continue hit Enter\n')
 
     def intro(self):
         """
@@ -679,21 +724,46 @@ class VM_UI():
         print('2- Delete a vending machine')
         print('3- Show vending machine information')
         print('4- Show sales and revenue in a date')
-        print('5- Exit\n')
+        print('5- Show sales and revenue in a date')
+        print('6- Exit\n')
         while (True):
-            user_input = input('Enter 1 - 5:\n')
-            for i in range(1, 6):
+            user_input = input('Enter 1 - 6:\n')
+            for i in range(1, 7):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose an option from the menu.')
 
     def date_input(self):
         self.clear()
-        year = ''
-        while (not year.isnumeric() and len(year) != 4):
-            year = input('Enter a year in a 4 digit format (2020):\n')
-            print('please enter a date in the correct format')
+        trigger = True
+        while (trigger):
+            print('Enter a year in a 4 digit format,')
+            year = input('example 2020:\n')
+            if ((year.isnumeric()) and (len(year) == 4)):
+                trigger = False
+            else:
+                print('Please enter a year in the correct format.\n')
+        self.clear()
+        trigger = True
+        while (trigger):
+            print('Enter a month in a 2 digit format,')
+            month = input('example 05:\n')
+            if ((month.isnumeric()) and (len(month) == 2)):
+                trigger = False
+            else:
+                print('Please enter a month in the correct format.\n')
+        self.clear()
+        trigger = True
+        while (trigger):
+            print('Enter a day in a 2 digit format,')
+            day = input('example 05:\n')
+            if ((day.isnumeric()) and (len(day) == 2)):
+                trigger = False
+            else:
+                print('Please enter a day in the correct format.\n')
         
+        return f'{year}-{month}-{day}'
+
     def address(self):
         """
         Ask the user for adress input
