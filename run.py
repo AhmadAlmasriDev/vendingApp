@@ -388,11 +388,14 @@ class Admin():
             address = self.ui.address()
             exception = self.vm_logic.create_vm(address)
             self.ui.feed_back('add', exception)
-        else:
+        elif option == "2":
             avaliable_machines = self.vm_logic.get_vm_list()
             vm_name = self.ui.select_machine(avaliable_machines)
             exception = self.vm_logic.delete_vm(vm_name)
             self.ui.feed_back('', exception)
+        else:
+            self.ui.outro('exit')
+
 
 
 # VendingMachine class ---------------------------------------------------
@@ -460,7 +463,7 @@ class VendingMachine():
         elif option == '2':
             self.vm_logic.update_vm('cashing')
             self.ui.outro('maintain cash')
-        elif option == '3':
+        else:
             self.ui.outro('exit')
         
 
@@ -502,21 +505,21 @@ class VM_UI():
             print('Thank You, for your purchase.')
             print('Have a nice day')
             sleep(3)
-        if op_type == "maintain topup":
+        elif op_type == "maintain topup":
             print('Maintenence finished')
             print('Vending Machine topped-up')
             print('Back to main menu')
             sleep(3)
-        if op_type == "maintain cash":
+        elif op_type == "maintain cash":
             print('Maintenence finished')
             print('Vending Machine Cashed')
             print('Back to main menu')
             sleep(3)
-        if op_type == "out":
+        elif op_type == "out":
             print('Sorry!')
             print('We are out of stock.')
             sleep(3)
-        if op_type == "exit":
+        else:
             print('Back to main menu')
             sleep(3)
 
