@@ -33,7 +33,8 @@ PRICE_BOUNTY = 4
 
 # VM_Logic class ---------------------------------------------------------
 class VM_Logic:
-    def __init__(self):
+    def __init__(self, ui):
+        self.ui = ui
         self.address = ""
         self.name = ""
         self.mars = 0
@@ -41,8 +42,6 @@ class VM_Logic:
         self.twix = 0
         self.bounty = 0
         self.cash = 0
-        self.date = ""
-        self.time = ""
 
     def get_vm_list(self):
         """
@@ -65,6 +64,22 @@ class VM_Logic:
         time = date_time.strftime("%H:%M")
         return [date, time]
 
+    def init_sales(self, date):
+        init_num = 0
+        current_row = [
+            date,
+            init_num,
+            init_num,
+            init_num,
+            init_num,
+            init_num
+            ]
+        try:
+            current_sales = SALES_SHEET.worksheet(self.name)
+            current_sales.append_row(current_row)
+        except gspread.exceptions.WorksheetNotFound as e:
+            self.ui.output_error(e)
+
     def update_vm(self, operation):
         """
         Update the values in the work sheet
@@ -86,13 +101,17 @@ class VM_Logic:
                 self.bounty,
                 self.cash
                 ]
-            current_vm = MACHINES_SHEET.worksheet(self.name)
-            current_vm.append_row(current_row)
+            try:
+                current_vm = MACHINES_SHEET.worksheet(self.name)
+                current_vm.append_row(current_row)
+            except gspread.exceptions.WorksheetNotFound as e:
+                self.ui.output_error(e)
         date_time = self.get_date_time()
         if operation == 'initialize':
             self.mars = self.snickers = self.twix = self.bounty = MAX_STOCK
             self.cash = 0
             upload_data()
+            self.init_sales(date_time[0])
         elif operation == 'cashing':
             self.cash = 0
             upload_data()
@@ -113,11 +132,7 @@ class VM_Logic:
             if len(data) > 3:
                 current_vm.delete_rows(4, len(data))
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the Alarms spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
 
     # def count_sales(self, vm):
     #     """
@@ -168,9 +183,9 @@ class VM_Logic:
     #             return count
 
     def count_sales(self, vm):
-        raw_info = MACHINES_SHEET.worksheet(vm)
+        raw_info = SALES_SHEET.worksheet(vm)
         data = raw_info.get_all_values()[-1] 
-        return [[int(item)] for index, item in enumerate(data) if index in range(1, 5)]
+        return [int(item) for index, item in enumerate(data) if index in range(1, 5)]
 
     def update_sales(self, index):
         """
@@ -188,7 +203,7 @@ class VM_Logic:
 
         date_time = self.get_date_time()
         sales = self.count_sales(self.name)
-        sales[index] += 1 
+        sales[index] += 1
         revenue = calculate_revenue()
         current_row = [
             date_time[0],
@@ -202,11 +217,7 @@ class VM_Logic:
             current_vm = SALES_SHEET.worksheet(self.name)
             current_vm.append_row(current_row)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the VendingSales spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
 
     # def update_sales(self):
     #     """
@@ -259,11 +270,7 @@ class VM_Logic:
             self.bounty = int(last_data[6])
             self.cash = float(last_data[7])
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the VendingMachine spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
 
     def check_stock(self):
         """
@@ -306,11 +313,7 @@ class VM_Logic:
             for row in rows:
                 current_vm.append_row(row)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the Alarms spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
 
     def get_work_sheet_data(self, vm):
         def calculate_sales(data):
@@ -332,11 +335,7 @@ class VM_Logic:
             print(all_data)
             sleep(10)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the VendingMachine spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
 
     def create_vm(self, address):
         """
@@ -396,33 +395,21 @@ class VM_Logic:
             worksheet_to_del = MACHINES_SHEET.worksheet(f'{name}')
             MACHINES_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the VendingMachine spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
             return (f'\nWith error: worksheet {e}' +
                     ' in the VendingMachine spread sheet not found.')
         try:
             worksheet_to_del = SALES_SHEET.worksheet(f'{name}')
             SALES_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the VendingSales spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
             return (f'\nWith error: worksheet {e}' +
                     ' in the VendingSales spread sheet not found.')
         try:
             worksheet_to_del = ALARM_SHEET.worksheet(f'{name}')
             ALARM_SHEET.del_worksheet(worksheet_to_del)
         except gspread.exceptions.WorksheetNotFound as e:
-            print('Trying to open non-existent sheet.')
-            print(
-                f'Please verify that the worksheet {e}' +
-                ' exists in the Alarms spread sheet.')
-            sleep(5)
+            self.ui.output_error(e)
             return (f'\nWith error: worksheet {e}' +
                     ' in the Alarms spread sheet not found.')
         return ('')
@@ -713,6 +700,13 @@ class VM_UI():
             print('Vending machine deleted successfully.' + exception)
             sleep(5)
 
+    def output_error(self, e):
+        print('Trying to open non-existent sheet.')
+        print(
+            f'Please verify that the worksheet {e}' +
+            ' exists in the VendingSales spread sheet.')
+        sleep(5)
+
 
 def main():
     """
@@ -721,7 +715,7 @@ def main():
     ui = VM_UI()
     ui.intro()
     while (True):
-        vm_logic = VM_Logic()
+        vm_logic = VM_Logic(ui)
         admin = Admin(ui, vm_logic)
         vm = VendingMachine(ui, vm_logic)
         user_input = ui.role()
