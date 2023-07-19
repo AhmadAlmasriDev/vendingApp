@@ -166,6 +166,11 @@ class VM_Logic:
                     count[i] += (int(prev_quantity[i])
                                  - int(temp_quantity[i]))
                 return count
+                
+    def count_sales2(self, vm):
+        raw_info = MACHINES_SHEET.worksheet(vm)
+        data = raw_info.get_all_values()[-1] 
+        return [[item] for index, item in enumerate(data) if index in range(1, 5)]
 
     def update_sales(self):
         """
@@ -269,6 +274,32 @@ class VM_Logic:
             print(
                 f'Please verify that the worksheet {e}' +
                 ' exists in the Alarms spread sheet.')
+            sleep(5)
+
+    def get_work_sheet_data(self, vm):
+        def calculate_sales(data):
+            pass
+        try:
+            data = MACHINES_SHEET.worksheet(vm)
+            vm_data = data.get_all_values()
+            data = SALES_SHEET.worksheet(vm)
+            sales_data = data.get_all_values()
+            data = ALARM_SHEET.worksheet(vm)
+            alarms_data = data.get_all_values()
+            all_data = {
+                'vm_data': vm_data,
+                'sales_data': sales_data,
+                'alarms_data': alarms_data
+            }
+            # self.ui.statistic_stock(vm_data)
+
+            print(all_data)
+            sleep(10)
+        except gspread.exceptions.WorksheetNotFound as e:
+            print('Trying to open non-existent sheet.')
+            print(
+                f'Please verify that the worksheet {e}' +
+                ' exists in the VendingMachine spread sheet.')
             sleep(5)
 
     def create_vm(self, address):
@@ -393,9 +424,12 @@ class Admin():
             vm_name = self.ui.select_machine(avaliable_machines)
             exception = self.vm_logic.delete_vm(vm_name)
             self.ui.feed_back('', exception)
+        elif option == "3":
+            avaliable_machines = self.vm_logic.get_vm_list()
+            vm_name = self.ui.select_machine(avaliable_machines)
+            self.vm_logic.get_work_sheet_data(vm_name)
         else:
             self.ui.outro('exit')
-
 
 
 # VendingMachine class ---------------------------------------------------
@@ -536,7 +570,7 @@ class VM_UI():
             for i in range(1, 3):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-                print('Please, choose an option from the menu.')
+            print('Please, choose an option from the menu.')
 
     def select_machine(self, avaliable_machines):
         """
@@ -590,8 +624,8 @@ class VM_UI():
         self.clear()
         print('select an option:\n')
         print('1- Topup')
-        print('2- Cashing\n')
-        print('3- Exit')
+        print('2- Cashing')
+        print('3- Exit\n')
         while (True):
             user_input = input('Enter 1 - 3:\n')
             for i in range(1, 4):
@@ -607,10 +641,11 @@ class VM_UI():
         print('select an option:\n')
         print('1- Create new vending machine')
         print('2- Delete a vending machine')
-        print('3- Exit\n')
+        print('3- Do somthing with data')
+        print('4- Exit\n')
         while (True):
-            user_input = input('Enter 1 or 3\n')
-            for i in range(1, 4):
+            user_input = input('Enter 1 - 4:\n')
+            for i in range(1, 5):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose an option from the menu.')
