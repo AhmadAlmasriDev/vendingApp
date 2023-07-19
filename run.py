@@ -441,10 +441,13 @@ class VendingMachine():
                         state = 'buy'
                     else:
                         state = 'out'
+                if vm_option == '6':
+                    state = 'exit'
                 if state == 'buy':
                     self.vm_logic.update_vm('sell')
                     self.vm_logic.update_sales()
                     self.vm_logic.update_alarms()
+                    # ---------------------------
                 self.ui.outro(state)
 
     def maintain(self, option):
@@ -511,6 +514,9 @@ class VM_UI():
             print('Sorry!')
             print('We are out of stock.')
             sleep(3)
+        if op_type == "exit":
+            print('Back to main menu')
+            sleep(3)
 
     def role(self):
         """
@@ -563,9 +569,10 @@ class VM_UI():
         print(f'3- Twix -------- {PRICE_TWIX}$')
         print(f'4- Bounty ------ {PRICE_BOUNTY}$')
         print('5- Maintenance\n')
+        print('6- Exit\n')
         while (True):
-            user_input = input('Enter 1 - 5\n')
-            for i in range(1, 6):
+            user_input = input('Enter 1 - 6:\n')
+            for i in range(1, 7):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose from the menu.')
