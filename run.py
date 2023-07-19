@@ -457,9 +457,11 @@ class VendingMachine():
         if option == '1':
             self.vm_logic.update_vm('topup')
             self.ui.outro('maintain topup')
-        if option == '2':
+        elif option == '2':
             self.vm_logic.update_vm('cashing')
             self.ui.outro('maintain cash')
+        elif option == '3':
+            self.ui.outro('exit')
         
 
 # VM_UI ------------------------------------------------------------------
@@ -527,10 +529,11 @@ class VM_UI():
         print('1- Vending machine')
         print('2- Admin\n')
         while (True):
-            user_input = input('Enter 1 or 2\n')
+            user_input = input('Enter 1 - 2:\n')
             for i in range(1, 3):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
+                print('Please, choose an option from the menu.')
 
     def select_machine(self, avaliable_machines):
         """
@@ -568,14 +571,14 @@ class VM_UI():
         print(f'2- Snickers ---- {PRICE_SNICKERS}$')
         print(f'3- Twix -------- {PRICE_TWIX}$')
         print(f'4- Bounty ------ {PRICE_BOUNTY}$')
-        print('5- Maintenance\n')
+        print('5- Maintenance')
         print('6- Exit\n')
         while (True):
             user_input = input('Enter 1 - 6:\n')
             for i in range(1, 7):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose from the menu.')
+            print('Please, choose an option from the menu.')
 
     def maintenance_menu(self):
         """
@@ -583,14 +586,15 @@ class VM_UI():
         """
         self.clear()
         print('Select:\n')
-        print(f'1- Topup')
-        print(f'2- Cashing\n')
+        print('1- Topup')
+        print('2- Cashing\n')
+        print('3- Exit')
         while (True):
-            user_input = input('Enter 1 or 2\n')
-            for i in range(1, 3):
+            user_input = input('Enter 1 - 3:\n')
+            for i in range(1, 4):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose from the menu.')
+            print('Please, choose an option from the menu.')
 
     def admin_menu(self):
         """
