@@ -1,4 +1,5 @@
 import gspread
+from pprint import pprint
 from google.oauth2.service_account import Credentials
 import datetime as dt
 from os import system, name
@@ -134,53 +135,79 @@ class VM_Logic:
         except gspread.exceptions.WorksheetNotFound as e:
             self.ui.output_error(e)
 
-    # def count_sales(self, vm):
-    #     """
-    #     Counts quantity of sold items
-    #     """
-    #     current_date_time = self.get_date_time()
-    #     raw_info = MACHINES_SHEET.worksheet(vm)
-    #     data = raw_info.get_all_values()[3:]
-    #     for i in reversed(range(len(data))):
-    #         prev_quantity = []
-    #         data_slice = []
-    #         if data[i][0] != current_date_time[0] or i == 0:
-    #             data_slice = data[i:]
-    #             count = [0, 0, 0, 0]
-    #             prev_quantity = [
-    #                 data[i][3],
-    #                 data[i][4],
-    #                 data[i][5],
-    #                 data[i][6]
-    #                 ]
-    #             temp_quantity = []
-    #             for i in range(len(data_slice)):
-    #                 if data_slice[i][2] == 'topup':
-    #                     temp_quantity = [
-    #                         data_slice[i-1][3],
-    #                         data_slice[i-1][4],
-    #                         data_slice[i-1][5],
-    #                         data_slice[i-1][6]
-    #                         ]
-    #                     for x in range(4):
-    #                         count[x] += (int(prev_quantity[x])
-    #                                      - int(temp_quantity[x]))
-    #                     prev_quantity = [
-    #                         MAX_STOCK,
-    #                         MAX_STOCK,
-    #                         MAX_STOCK,
-    #                         MAX_STOCK
-    #                         ]
-    #                 temp_quantity = [
-    #                     data_slice[i][3],
-    #                     data_slice[i][4],
-    #                     data_slice[i][5],
-    #                     data_slice[i][6]
-    #                     ]
-    #             for i in range(4):
-    #                 count[i] += (int(prev_quantity[i])
-    #                              - int(temp_quantity[i]))
-    #             return count
+    def count_sales_in_date(self, vm, date):
+        """
+        Counts quantity of sold items
+        for the date privided
+        """
+        raw_info = MACHINES_SHEET.worksheet(vm)
+        data = raw_info.get_all_values()[3:]
+        for i in reversed(range(len(data))):
+            prev_quantity = []
+            data_slice = []
+            if data[i][0] != date or i == 0:
+                data_slice = data[i:]
+                count = [0, 0, 0, 0]
+                prev_quantity = [
+                    data[i][3],
+                    data[i][4],
+                    data[i][5],
+                    data[i][6]
+                    ]
+                temp_quantity = []
+                for i in range(len(data_slice)):
+                    if data_slice[i][2] == 'topup':
+                        temp_quantity = [
+                            data_slice[i-1][3],
+                            data_slice[i-1][4],
+                            data_slice[i-1][5],
+                            data_slice[i-1][6]
+                            ]
+                        for x in range(4):
+                            count[x] += (int(prev_quantity[x])
+                                         - int(temp_quantity[x]))
+                        prev_quantity = [
+                            MAX_STOCK,
+                            MAX_STOCK,
+                            MAX_STOCK,
+                            MAX_STOCK
+                            ]
+                    temp_quantity = [
+                        data_slice[i][3],
+                        data_slice[i][4],
+                        data_slice[i][5],
+                        data_slice[i][6]
+                        ]
+                for i in range(4):
+                    count[i] += (int(prev_quantity[i])
+                                 - int(temp_quantity[i]))
+                return count
+
+    def calculate_sales_in_date(self, vm, date):
+        """
+        Calculate the items and revenue in a given date
+        """
+        def calculate_revenue():
+            """
+            Calulate the revenue according to the prices in constants
+            """
+            price = [PRICE_MARS, PRICE_SNICKERS, PRICE_TWIX, PRICE_BOUNTY]
+            revenue = 0
+            for item, price in zip(sales, price):
+                revenue += item * price
+            return revenue
+        
+        sales = self.count_sales_in_date(vm, date)
+        revenue = calculate_revenue()
+        current_data = {
+            'date': date,
+            'Mars': sales[0],
+            'Snickers': sales[1],
+            'Twix': sales[2],
+            'Bounty': sales[3],
+            'Revenue': revenue
+            }
+        return current_data
 
     def count_sales(self, vm):
         raw_info = SALES_SHEET.worksheet(vm)
@@ -218,41 +245,6 @@ class VM_Logic:
             current_vm.append_row(current_row)
         except gspread.exceptions.WorksheetNotFound as e:
             self.ui.output_error(e)
-
-    # def update_sales(self):
-    #     """
-    #     Updates the sales sheet with the calculated values
-    #     """
-    #     def calculate_revenue():
-    #         """
-    #         Calulate the revenue according to the prices in constants
-    #         """
-    #         price = [PRICE_MARS, PRICE_SNICKERS, PRICE_TWIX, PRICE_BOUNTY]
-    #         revenue = 0
-    #         for item, price in zip(sales, price):
-    #             revenue += item * price
-    #         return revenue
-
-    #     date_time = self.get_date_time()
-    #     sales = self.count_sales(self.name)
-    #     revenue = calculate_revenue()
-    #     current_row = [
-    #         date_time[0],
-    #         sales[0],
-    #         sales[1],
-    #         sales[2],
-    #         sales[3],
-    #         revenue
-    #         ]
-    #     try:
-    #         current_vm = SALES_SHEET.worksheet(self.name)
-    #         current_vm.append_row(current_row)
-    #     except gspread.exceptions.WorksheetNotFound as e:
-    #         print('Trying to open non-existent sheet.')
-    #         print(
-    #             f'Please verify that the worksheet {e}' +
-    #             ' exists in the VendingSales spread sheet.')
-    #         sleep(5)
 
     def get_data(self, vm):
         """
@@ -315,25 +307,24 @@ class VM_Logic:
         except gspread.exceptions.WorksheetNotFound as e:
             self.ui.output_error(e)
 
-    def get_work_sheet_data(self, vm):
-        def calculate_sales(data):
-            pass
+    def get_vm_stock_info(self, vm):
+
         try:
             data = MACHINES_SHEET.worksheet(vm)
             vm_data = data.get_all_values()
-            data = SALES_SHEET.worksheet(vm)
-            sales_data = data.get_all_values()
-            data = ALARM_SHEET.worksheet(vm)
-            alarms_data = data.get_all_values()
-            all_data = {
-                'vm_data': vm_data,
-                'sales_data': sales_data,
-                'alarms_data': alarms_data
-            }
-            # self.ui.statistic_stock(vm_data)
-
-            print(all_data)
-            sleep(10)
+            address = vm_data[0][1]
+            last_data = vm_data[-1]
+            result = {
+                'Vending Machine address': address,
+                'Last operation date': last_data[0],
+                'Last operation type': last_data[2],
+                'Mars': last_data[3],
+                'Snickers': last_data[4],
+                'Twix': last_data[5],
+                'Bounty': last_data[6],
+                'Revenue': last_data[7]
+                }
+            return result
         except gspread.exceptions.WorksheetNotFound as e:
             self.ui.output_error(e)
 
@@ -450,7 +441,14 @@ class Admin():
         elif option == "3":
             avaliable_machines = self.vm_logic.get_vm_list()
             vm_name = self.ui.select_machine(avaliable_machines)
-            self.vm_logic.get_work_sheet_data(vm_name)
+            latest_data = self.vm_logic.get_vm_stock_info(vm_name)
+            self.ui.output_result(latest_data)
+        elif option == "4":
+            avaliable_machines = self.vm_logic.get_vm_list()
+            vm_name = self.ui.select_machine(avaliable_machines)
+            latest_data = self.vm_logic.calculate_sales_in_date(vm_name, '2023-07-19')
+            self.ui.output_result(latest_data)
+            
         else:
             self.ui.outro('exit')
 
@@ -541,6 +539,17 @@ class VM_UI():
             _ = system('cls')
         else:
             _ = system('clear')
+
+    def output_result(self, res):
+        """
+        Print result dictionary via terminal
+        """
+        self.clear()
+        for key, item in res.items():
+            print(f'{key} : {item}')
+        user_input = ' '
+        while user_input != '':
+            user_input = input('\nTo continue hit Enter\n')
 
     def intro(self):
         """
@@ -668,15 +677,23 @@ class VM_UI():
         print('select an option:\n')
         print('1- Create new vending machine')
         print('2- Delete a vending machine')
-        print('3- Do somthing with data')
-        print('4- Exit\n')
+        print('3- Show vending machine information')
+        print('4- Show sales and revenue in a date')
+        print('5- Exit\n')
         while (True):
-            user_input = input('Enter 1 - 4:\n')
-            for i in range(1, 5):
+            user_input = input('Enter 1 - 5:\n')
+            for i in range(1, 6):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
             print('Please, choose an option from the menu.')
 
+    def date_input(self):
+        self.clear()
+        year = ''
+        while (not year.isnumeric() and len(year) != 4):
+            year = input('Enter a year in a 4 digit format (2020):\n')
+            print('please enter a date in the correct format')
+        
     def address(self):
         """
         Ask the user for adress input
