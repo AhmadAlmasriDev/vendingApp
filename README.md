@@ -93,7 +93,9 @@ The app is a terminal interface with options that the user can choose from.
     <summary>Spread Sheets</summary>
 
     ![vm](documentation/sale-templates-machine.jpg)
+
     ![sales](documentation/sale-templates-sale.jpg)
+
     ![alarms](documentation/sale-templates-alarm.jpg)
 
     </details> 
@@ -123,7 +125,9 @@ The app is a terminal interface with options that the user can choose from.
         <summary>One Item Sold</summary>
 
         ![vm](documentation/sale-one-machine.jpg)
+
         ![sales](documentation/sale-one-sales.jpg)
+
         ![alarms](documentation/sale-one-alarm.jpg)
 
         </details> 
@@ -133,7 +137,9 @@ The app is a terminal interface with options that the user can choose from.
         <summary>Stock Near Finish</summary>
 
         ![vm](documentation/sale-almost-machine.jpg)
+
         ![sales](documentation/sale-almost-sale.jpg)
+
         ![alarms](documentation/sale-almost-alarm.jpg)
 
         </details> 
@@ -143,7 +149,9 @@ The app is a terminal interface with options that the user can choose from.
         <summary>Stock Finished</summary>
 
         ![vm](documentation/sale-empty-machine.jpg)
+
         ![sales](documentation/sale-empty-sale.jpg)
+
         ![alarms](documentation/sale-empty-alarm.jpg)
 
         </details> 
@@ -153,7 +161,9 @@ The app is a terminal interface with options that the user can choose from.
         <summary>Cashed</summary>
 
         ![vm](documentation/sale-cash-machine.jpg)
+
         ![sales](documentation/sale-cash-sale.jpg)
+
         ![alarms](documentation/sale-cash-alarm.jpg)
 
         </details> 
@@ -163,7 +173,9 @@ The app is a terminal interface with options that the user can choose from.
         <summary>Toped-up</summary>
 
         ![vm](documentation/sale-topup-machine.jpg)
+
         ![sales](documentation/sale-topup-sale.jpg)
+
         ![alarms](documentation/sale-topup-alarm.jpg)
 
         </details> 
@@ -173,13 +185,53 @@ The app is a terminal interface with options that the user can choose from.
     <summary>User Notification</summary>
 
     ![user notification 1](documentation/notification-1.jpg)
+
     ![user notification 2](documentation/notification-2.jpg)
 
     </details>
     <br>
+- Show information about a certain vm 
+
+    <details close>
+    <summary>Show VM Information</summary>
+
+    ![admin menu](documentation/menu-admin.jpg)
+
+    ![vm info](documentation/show-info.jpg)
+
+    </details>
+    <br>
+- Show alarms for a certain vm
+
+    <details close>
+    <summary>Show Alarms</summary>
+
+    ![admin menu](documentation/menu-admin.jpg)
+
+    ![alarms](documentation/show-alarm.jpg)
+
+    </details>
+    <br>
+- Show sales and revenue for a certain vm on specific date
+
+    <details close>
+    <summary>Show Sales And Revenue</summary>
+
+    ![admin menu](documentation/menu-admin.jpg)
+
+    ![year](documentation/input-year.jpg)
+
+    ![month](documentation/input-month.jpg)
+
+    ![day](documentation/input-day.jpg)
+
+    ![sales](documentation/show-sales.jpg)
+
+    </details>
+    <br>
+
 ### **Future Features**
-- The ability to show the user the date from the spread sheets to the user directly via the application.
-- send The user an email when an alarm occurs.     
+- send The user an email or SMS when an alarm occurs.     
 
 ## **Data Model**
 I decided to go with classes to separate the logic in to groups.

@@ -58,9 +58,9 @@ I have also used  [CI Python Linter](https://pep8ci.herokuapp.com/)  Validator t
 |To be able to buy from a vm.| By selecting a vm and select an item from vm menu.| [main menu](documentation/menu-main.jpg), [choose vm](documentation/menu-select.jpg), [vm menu](documentation/menu-vm.jpg), [notification](documentation/notification-1.jpg), [vm machine spread sheet](documentation/sale-one-machine.jpg).
 |To be able to top-up a vm.| By choosing the maintenance menu from vm menu and then select topup| [vm menu](documentation/menu-vm.jpg), [maintenance menu](documentation/menu-maintenance.jpg), [notification](documentation/feed-back-3.jpg), [vm machine spread sheet](documentation/sale-topup-machine.jpg).
 |To be able to cash a vm.| By choosing the maintenance menu from vm menu and then select cashing| [vm menu](documentation/menu-vm.jpg), [maintenance menu](documentation/menu-maintenance.jpg), [notification](documentation/feed-back-3.jpg).
-|To provide the user with a way to check the stock on each vm.| By checking the VendingMachine spread sheet| [vm machine spread sheet](documentation/sale-almost-machine.jpg).
-|To provide the user with a way to check the alarms for each vm.| By checking the Alarms spread sheet| [alarm spread sheet](documentation/sale-empty-alarm.jpg).
-|To provide the user with a way to check the sales and revenue for each vm.| By checking the VendingSales spread sheet| [sales spread sheet](documentation/sale-almost-sale.jpg).
+|To provide the user with a way to check the stock on each vm.| By checking the VendingMachine spread sheet or via the app| [vm machine spread sheet](documentation/sale-almost-machine.jpg), [vm info](documentation/show-info.jpg).
+|To provide the user with a way to check the alarms for each vm.| By checking the Alarms spread sheet or via the app| [alarm spread sheet](documentation/sale-empty-alarm.jpg), [alarm info](documentation/show-alarm.jpg).
+|To provide the user with a way to check the sales and revenue for each vm.| By checking the VendingSales spread sheet or via the app| [sales spread sheet](documentation/sale-almost-sale.jpg), [sales info](documentation/show-sales.jpg).
 
 ### Full Testing
 
@@ -96,10 +96,12 @@ I have also used  [CI Python Linter](https://pep8ci.herokuapp.com/)  Validator t
 | Enter option 4 (Bounty) when stock is 1 pcs.| A notification of purchase appears, the main menu appears, the machine spread sheet updates with current stock and cash, the sales spread sheet updates with sales and revenue, an alarm "stock empty" appears in the alarms spread sheet.| Enter option 4 (Bounty) |A notification of purchase appeared, the main menu appeared, the machine spread sheet updated with current stock and cash, the sales spread sheet updated with sales and revenue, an alarm "stock empty" appeared in the alarms spread sheet.| Pass |
 | Enter option 4 (Bounty) when stock is 0 pcs.| A notification of out of stock appears, the main menu appears.| Enter option 4 (Bounty) |A notification of out of stock appears, the main menu appeared.| Pass |
 | Enter option 5 (Maintenance)| The Maintenance menu appears.| Enter option 5 (Maintenance) | The Maintenance menu appeared.| Pass |
+| Enter option 6 (Exit)| A notification Back to main menu appears, The Main menu appears.| Enter option 6 (exit) | A notification Back to main menu appeared, The Main menu appeared.| Pass |
 | Enter other option not from the list| A notification enter 1 -5 appears.| Enter other option not from the list | A notification enter 1 -5 appeared.| Pass |
 | **MAINTENANCE MENU** |  |  |  |  |
 | Enter option 1 (Topup)| All the stock quantities in the machine spread sheet updates to 10 pcs, deletes the alarms in the alarm spread sheet, a notification maintenance finished appears, the main menu appears.| Enter option 1 (Topup) | All the stock quantities in the machine spread sheet updated to 10 pcs, deleted the alarms in the alarm spread sheet, a notification maintenance finished appeared, the main menu appeared.| Pass |
 | Enter option 2 (Cashing)| The cash amount in the machine spread sheet updates to 0, a notification maintenance finished appears, the main menu appears.| Enter option 2 (Cashing) | The cash amount in the machine spread sheet updated to 0, a notification maintenance finished appeared, the main menu appeared.| Pass |
+| Enter option 3 (Exit)| A notification Back to main menu appears, The Main menu appears.| Enter option 3 (exit) | A notification Back to main menu appeared, The Main menu appeared.| Pass |
 | Enter other option not in the list | A notification Enter 1 or 2 appears.| Enter other option not in the list | A notification Enter 1 or 2 appears.| Pass |
 | **ADMIN MENU** |  |  |  |  |
 | Enter option 1 (create vm) | A prompt input address appears. | Enter option 1 (create vm) | A prompt input address appears. | Pass |
@@ -108,6 +110,16 @@ I have also used  [CI Python Linter](https://pep8ci.herokuapp.com/)  Validator t
 | Enter option 2 (delete vm) | A prompt select machine appears. | Enter option 2 (delete vm) | A prompt select machine appears. | Pass |
 | Enter machine name from list| Deletes the selected vm spread sheet from the (machine, sales, alarms) work sheets,  notification deleted successfully appears, the main menu appears. | Enter name from list |Deleted the selected vm spread sheet from the (machine, sales, alarms) work sheets,  notification deleted successfully appeared, the main menu appeared. | Pass |
 | Enter machine name from list while one of the vm spread sheets is duplicated or missing | Deletes the selected vm spread sheet from the (machine, sales, alarms) work sheets until encounters the duplicate,  notification deleted successfully appears with the error that occurred, the main menu appears. | Enter name from list | Deleted the selected vm spread sheet from the (machine, sales, alarms) work sheets until encountered the duplicate,  notification deleted successfully appeared with the error that occurred, the main menu appeared. | Pass |
+| Enter option 3 (show vm info) | A prompt select machine appears. | Enter option 3 (show vm info) | A prompt select machine appeared. | Pass |
+| Enter machine name from list| Info about this vm appears, a prompt to continue hit enter appears. | Enter name from list |Info about this vm appeared, a prompt to continue hit enter appeared. | Pass |
+| Press enter| notification back to main menu appears, the main menu appears. | Enter name from list |notification back to main menu appeared, the main menu appeared. | Pass |
+| Enter option 4 (show sales and revenue) | A prompt select machine appears. | Enter option 4 (show sales and revenue) | A prompt select machine appeared. | Pass |
+| Enter machine name from list| Sales and revenue info about this vm appears, a prompt to continue hit enter appears. | Enter name from list |Sales and revenue info about this vm appeared, a prompt to continue hit enter appeared. | Pass |
+| Press enter| notification back to main menu appears, the main menu appears. | Enter name from list |notification back to main menu appeared, the main menu appeared. | Pass |
+| Enter option 5 (show alarms) | A prompt select machine appears. | Enter option 5 (show alarms) | A prompt select machine appeared. | Pass |
+| Enter machine name from list| Alarms for this vm appears, a prompt to continue hit enter appears. | Enter name from list | Alarms for this vm appeared, a prompt to continue hit enter appeared. | Pass |
+| Press enter| notification back to main menu appears, the main menu appears. | Enter name from list |notification back to main menu appeared, the main menu appeared. | Pass |
+| Enter option 6 (exit) | A notification back to main menu appears, the main menu appears. | Enter option 6 (exit) | A notification back to main menu appeared, the main menu appeared. | Pass |
 | Enter other machine name not from list| A prompt appears to enter a name from the list| Enter other name not from the list | A prompt appeared to enter a name from the list | Pass |
 
 ---

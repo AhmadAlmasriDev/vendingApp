@@ -568,7 +568,7 @@ class VendingMachine():
             self.ui.outro('maintain cash')
         else:
             self.ui.outro('exit')
-        
+
 
 # VM_UI ------------------------------------------------------------------
 class VM_UI():
@@ -651,7 +651,7 @@ class VM_UI():
             for i in range(1, 3):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose an option from the menu.')
+            print('Please, choose an option from the menu.\n')
 
     def select_machine(self, avaliable_machines):
         """
@@ -669,7 +669,7 @@ class VM_UI():
                     if name == user_input:
                         self.name = user_input
                         return user_input
-                print('Please, choose a name from the list.')
+                print('Please, choose a name from the list.\n')
         else:
             print(
                 'There are no machines found.\nYou can' +
@@ -696,7 +696,7 @@ class VM_UI():
             for i in range(1, 7):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose an option from the menu.')
+            print('Please, choose an option from the menu.\n')
 
     def maintenance_menu(self):
         """
@@ -712,7 +712,7 @@ class VM_UI():
             for i in range(1, 4):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose an option from the menu.')
+            print('Please, choose an option from the menu.\n')
 
     def admin_menu(self):
         """
@@ -723,15 +723,15 @@ class VM_UI():
         print('1- Create new vending machine')
         print('2- Delete a vending machine')
         print('3- Show vending machine information')
-        print('4- Show sales and revenue in a date')
-        print('5- Show sales and revenue in a date')
+        print('4- Show sales and revenue in a certain date')
+        print('5- Show alarms for a certain vending machine')
         print('6- Exit\n')
         while (True):
             user_input = input('Enter 1 - 6:\n')
             for i in range(1, 7):
                 if user_input.isnumeric() and int(user_input) == i:
                     return user_input
-            print('Please, choose an option from the menu.')
+            print('Please, choose an option from the menu.\n')
 
     def date_input(self):
         self.clear()
@@ -761,7 +761,6 @@ class VM_UI():
                 trigger = False
             else:
                 print('Please enter a day in the correct format.\n')
-        
         return f'{year}-{month}-{day}'
 
     def address(self):
@@ -773,7 +772,7 @@ class VM_UI():
             user_input = input('Enter an address.\n')
             if user_input.strip() != '':
                 return user_input
-        print('Enter valid address, please.')
+        print('Enter valid address, please.\n')
 
     def feed_back(self, option, exception):
         """
