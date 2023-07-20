@@ -58,7 +58,13 @@ VendingMachine - contains information about the vms (address, operation, stock, 
 VendingSales - contains information about the item sold and the revenue.
 Alarms - contains information about the items being almost or out of stock.
 The user can top-up the vm or cash the money if needed. 
+<details close>
+<summary>Initial Design Flowchart</summary>
 
+![flowchart](documentation/flipchart.jpg)
+
+</details> 
+<br>
 ### **User Stories**
 
 **Goals**
