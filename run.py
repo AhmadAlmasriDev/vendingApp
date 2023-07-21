@@ -363,7 +363,7 @@ class VM_Logic:
                 'Snickers': last_data[4],
                 'Twix': last_data[5],
                 'Bounty': last_data[6],
-                'Revenue': last_data[7]
+                'Cash': last_data[7]
                 }
             return result
         except gspread.exceptions.WorksheetNotFound as e:
