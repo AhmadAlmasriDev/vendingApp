@@ -149,8 +149,12 @@ class VM_Logic:
         raw_info = MACHINES_SHEET.worksheet(vm)
         data = raw_info.get_all_values()[3:]
         data_slice = []
-        for item in data:
+        first_sell = True
+        for i, item in enumerate(data):
             if item[0] == date:
+                if (first_sell and item[2] == 'sell'):
+                    data_slice.append(data[i-1])
+                    first_sell = False
                 data_slice.append(item)
         if (data_slice != []):
             count = [0, 0, 0, 0]
@@ -208,7 +212,7 @@ class VM_Logic:
         if sales == [0, 0, 0, 0]:
             return {
                 'No data available': 'There is no data available for ' +
-                'this date, or the date is incorrect'
+                'this date,\nor the date is incorrect'
             }
         revenue = calculate_revenue()
         current_data = {
