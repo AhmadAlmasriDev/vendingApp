@@ -10,7 +10,7 @@ Vending machines info.
 Sales info.
 Stock quantity alarms.   
 
-[View VendingApp on Heroku](https://vendingapp-8ebedfdd40cd.herokuapp.com/)
+[View VendingApp on Heroku](https://masvendingapp-017267977321.herokuapp.com/)
 
 [View VendingMachine spreadsheet](https://docs.google.com/spreadsheets/d/1WgqyZJv61UsML8GGC8QygVm5rDc_4K5IeFve66Sfjp8/edit?usp=sharing)
 
