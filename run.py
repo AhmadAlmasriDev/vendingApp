@@ -148,46 +148,48 @@ class VM_Logic:
         """
         raw_info = MACHINES_SHEET.worksheet(vm)
         data = raw_info.get_all_values()[3:]
-        for i in reversed(range(len(data))):
-            prev_quantity = []
-            data_slice = []
-            if data[i][0] != date or i == 0:
-                data_slice = data[i:]
-                count = [0, 0, 0, 0]
-                prev_quantity = [
-                    data[i][3],
-                    data[i][4],
-                    data[i][5],
-                    data[i][6]
-                    ]
-                temp_quantity = []
-                for i in range(len(data_slice)):
-                    if data_slice[i][2] == 'topup':
-                        temp_quantity = [
-                            data_slice[i-1][3],
-                            data_slice[i-1][4],
-                            data_slice[i-1][5],
-                            data_slice[i-1][6]
-                            ]
-                        for x in range(4):
-                            count[x] += (int(prev_quantity[x])
-                                         - int(temp_quantity[x]))
-                        prev_quantity = [
-                            MAX_STOCK,
-                            MAX_STOCK,
-                            MAX_STOCK,
-                            MAX_STOCK
-                            ]
+        data_slice = []
+        for item in data:
+            if item[0] == date:
+                data_slice.append(item)
+        if (data_slice != []):
+            count = [0, 0, 0, 0]
+            prev_quantity = [
+                data_slice[0][3],
+                data_slice[0][4],
+                data_slice[0][5],
+                data_slice[0][6]
+                ]
+            temp_quantity = []
+            for i in range(len(data_slice)):
+                if data_slice[i][2] == 'topup':
                     temp_quantity = [
-                        data_slice[i][3],
-                        data_slice[i][4],
-                        data_slice[i][5],
-                        data_slice[i][6]
+                        data_slice[i-1][3],
+                        data_slice[i-1][4],
+                        data_slice[i-1][5],
+                        data_slice[i-1][6]
                         ]
-                for i in range(4):
-                    count[i] += (int(prev_quantity[i])
-                                 - int(temp_quantity[i]))
-                return count
+                    for x in range(4):
+                        count[x] += (int(prev_quantity[x])
+                                     - int(temp_quantity[x]))
+                    prev_quantity = [
+                        MAX_STOCK,
+                        MAX_STOCK,
+                        MAX_STOCK,
+                        MAX_STOCK
+                        ]
+                temp_quantity = [
+                    data_slice[i][3],
+                    data_slice[i][4],
+                    data_slice[i][5],
+                    data_slice[i][6]
+                    ]
+            for i in range(4):
+                count[i] += (int(prev_quantity[i])
+                             - int(temp_quantity[i]))
+            return count
+        else:
+            return [0, 0, 0, 0]
 
     def calculate_sales_in_date(self, vm, date):
         """
