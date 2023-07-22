@@ -16,7 +16,7 @@
 - [Testing](#testing)
   - [CONTENTS](#contents)
   - [AUTOMATED TESTING](#automated-testing)
-    - [CI Python Linter Validator](#CI-Python-Linter-Validator)
+    - [CI Python Linter Validator](#ci-python-linter-validator)
   - [MANUAL TESTING](#manual-testing)
     - [Testing User Stories](#testing-user-stories)
     - [Full Testing](#full-testing)

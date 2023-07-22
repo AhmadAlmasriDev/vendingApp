@@ -24,19 +24,18 @@ Stock quantity alarms.
 
 - [VendingApp](#VendingApp)
   - [**CONTENTS**](#contents)
-  - [**User Experience (UX)**](#user-experience-ux)
+  - [**User Experience (UX)**](#user-experience-(ux))
     - [Initial Discussion](#initial-discussion)
     - [User Stories](#user-stories)
-  - [**Features**](#Features)
-    - [Existing Features](#Existing-Features)
-    - [Future Features](#Future-Features)
-  - [**Data Model**](#Data-Model)
+  - [**Features**](#features)
+    - [Existing Features](#existing-features)
+    - [Future Features](#future-features)
+  - [**Data Model**](#data-model)
   - [**Technologies Used**](#technologies-used)
     - [Languages Used](#languages-used)
     - [Frameworks, Libraries \& Programs Used](#frameworks-libraries--programs-used)
   - [**Deployment \& Local Development**](#deployment--local-development)
     - [Deployment](#deployment)
-    - [Local Development](#local-development)
       - [How to Fork](#how-to-fork)
       - [How to Clone](#how-to-clone)
   - [**Testing**](#testing)
@@ -65,6 +64,7 @@ The user can top-up the vm or cash the money if needed.
 
 </details> 
 <br>
+
 ### **User Stories**
 
 **Goals**
@@ -80,7 +80,9 @@ The user can top-up the vm or cash the money if needed.
 - To provide the user with a way to check the sales and revenue for each vm. 
 
 ---
+
 ## **Features**
+
 ### **Existing Features**
 
 The app is a terminal interface with options that the user can choose from.
@@ -312,6 +314,7 @@ To clone the VendingApp repository:
 ## Credits
 
 <br/>
+
 ### Code Used
 
 - Most of the solutions to coding problems I encountered where taken from the [W3 School](https://www.w3schools.com/) and [Python website](https://www.python.org/) websites and off course [Stack over flow](https://stackoverflow.com/).
